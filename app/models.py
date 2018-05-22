@@ -98,6 +98,33 @@ class Preview(db.Model):
         return '<Preview %r>' % self.title
 
 
+# 评论
+class Comment(db.Model):
+    __tablename__ = 'comment'
+    id = db.Column(db.Integer, primary_key=True)  # 编号
+    content = db.Column(db.Text)  # 评论内容
+    # 关联外键第一步，还要去user表和movie表进行第二步
+    movie_id = db.Column(db.Integer, db.ForeignKey('movie.id'))  # 所属电影
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # 所属用户
+    addtime = db.Column(db.DateTime, index=True, default=datetime.now)  # 添加时间
+
+    def __repr__(self):
+        return '<Comment %r>' % self.id
+
+
+# 电影收藏
+class Moviecol(db.Model):
+    __tablename__ = 'moviecol'
+    id = db.Column(db.Integer, primary_key=True)  # 编号
+    # 关联外键第一步，还要去user表和movie表进行第二步
+    movie_id = db.Column(db.Integer, db.ForeignKey('movie.id'))  # 所属电影
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # 所属用户
+    addtime = db.Column(db.DateTime, index=True, default=datetime.now)  # 添加时间
+
+    def __repr__(self):
+        return '<Moviecol %r>' % self.id
+
+
 if __name__ == '__main__':
     # 删除表
     db.drop_all()
