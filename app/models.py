@@ -125,6 +125,31 @@ class Moviecol(db.Model):
         return '<Moviecol %r>' % self.id
 
 
+# 权限
+class Auth(db.Model):
+    __tablename__ = 'auth'
+    id = db.Column(db.Integer, primary_key=True)  # 编号
+    name = db.Column(db.String(100), unique=True)  # 名称
+    url = db.Column(db.String(255), unique=True)  # url地址
+    addtime = db.Column(db.DateTime, index=True, default=datetime.now)  # 创建时间
+
+    def __repr__(self):
+        return '<Auth %r>' % self.name
+
+
+# 角色
+class Role(db.Model):
+    __tablename__ = 'role'
+    id = db.Column(db.Integer, primary_key=True)  # 编号
+    name = db.Column(db.String(100), unique=True)  # 名称
+    auths = db.Column(db.String(600))  # 角色权限列表
+    addtime = db.Column(db.DateTime, index=True, default=datetime.now)  # 创建时间
+    admins = db.relationship('Admin', backref='role')  # 管理员外键关系关联
+
+    def __repr__(self):
+        return '<Role %r>' % self.name
+
+
 if __name__ == '__main__':
     # 删除表
     db.drop_all()
