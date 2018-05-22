@@ -195,11 +195,29 @@ class Oplog(db.Model):
         return '<Oplog %r>' % self.id
 
 
-if __name__ == '__main__':
-    # 删除表
-    db.drop_all()
+# 执行创建表语句
+# if __name__ == '__main__':
+    # # 删除表
+    # db.drop_all()
+    #
+    # # 创建表
+    # db.create_all()
+    #
+    # role = Role(
+    #     name="超级管理员",
+    #     auths=""
+    # )
+    # db.session.add(role)
+    # db.session.commit()
 
-    # 创建表
-    db.create_all()
-
-    app.run(debug=True)
+    # from werkzeug.security import generate_password_hash
+    # admin = Admin(
+    #     name="movie",
+    #     pwd=generate_password_hash("movie"),
+    #     is_super=0,
+    #     role_id=1
+    # )
+    # db.session.add(admin)
+    # db.session.commit()
+    #
+    # app.run(debug=True)
