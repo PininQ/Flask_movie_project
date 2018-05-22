@@ -150,6 +150,51 @@ class Role(db.Model):
         return '<Role %r>' % self.name
 
 
+# 管理员
+class Admin(db.Model):
+    __tablename__ = 'admin'
+    id = db.Column(db.Integer, primary_key=True)  # 编号
+    name = db.Column(db.String(100), unique=True)  # 管理员账号
+    pwd = db.Column(db.String(100))  # 管理员密码
+    is_super = db.Column(db.SmallInteger)  # 是否为超级管理员，0为超级管理员
+    role_id = db.Column(db.Integer, db.ForeignKey('role.id'))  # 所属角色
+    addtime = db.Column(db.DateTime, index=True, default=datetime.now)  # 添加时间
+    adminlogs = db.relationship('Adminlog', backref='admin')  # 管理员登录日志外键关系关联
+    oplogs = db.relationship('Oplog', backref='admin')  # 管理员操作日志外键关系关联
+
+    def __repr__(self):
+        return '<Admin %r>' % self.name
+
+    def check_pwd(self, pwd):
+        from werkzeug.security import check_password_hash
+        return check_password_hash(self, pwd)
+
+
+# 管理员登录日志
+class Adminlog(db.Model):
+    __tablename__ = 'adminlog'
+    id = db.Column(db.Integer, primary_key=True)  # 编号
+    admin_id = db.Column(db.Integer, db.ForeignKey('admin.id'))  # 所属管理员
+    ip = db.Column(db.String(100))  # 登录IP
+    addtime = db.Column(db.DateTime, index=True, default=datetime.now)  # 登录时间
+
+    def __repr__(self):
+        return '<Adminlog %r>' % self.id
+
+
+# 管理员操作日志
+class Oplog(db.Model):
+    __tablename__ = 'oplog'
+    id = db.Column(db.Integer, primary_key=True)  # 编号
+    admin_id = db.Column(db.Integer, db.ForeignKey('admin.id'))  # 所属管理员
+    ip = db.Column(db.String(100))  # 操作IP
+    reason = db.Column(db.String(600))  # 操作原因
+    addtime = db.Column(db.DateTime, index=True, default=datetime.now)  # 登录时间
+
+    def __repr__(self):
+        return '<Oplog %r>' % self.id
+
+
 if __name__ == '__main__':
     # 删除表
     db.drop_all()
