@@ -21,3 +21,9 @@ def login():
 def logout():
     # 重定向到home模块下的登录
     return redirect(url_for('home.login'))
+
+
+# 注册
+@home.route('/register/')
+def register():
+    return render_template('home/register.html')
