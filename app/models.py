@@ -49,6 +49,55 @@ class Userlog(db.Model):
         return '<Userlog %r>' % self.id
 
 
+# 标签
+class Tag(db.Model):
+    __tablename__ = 'tag'
+    id = db.Column(db.Integer, primary_key=True)  # 编号
+    name = db.Column(db.String(100), unique=True)  # 标题
+    addtime = db.Column(db.DateTime, index=True, default=datetime.now)  # 添加电影时间
+    # （设置外键的第二步）
+    movies = db.relationship('Movie', backref='tag')  # 电影外键关系关联
+
+    def __repr__(self):
+        return '<Tag %r>' % self.name
+
+
+# 电影
+class Movie(db.Model):
+    __tablename__ = 'movie'
+    id = db.Column(db.Integer, primary_key=True)  # 编号
+    title = db.Column(db.String(255), unique=True)  # 标题
+    url = db.Column(db.String(255), unique=True)  # 地址
+    info = db.Column(db.Text)  # 电影简介
+    logo = db.Column(db.String(255), unique=True)  # 封面
+    star = db.Column(db.SmallInteger)  # 星级
+    playnum = db.Column(db.BigInteger)  # 播放量
+    commentnum = db.Column(db.BigInteger)  # 评论量
+    # （设置外键第一步）
+    tag_id = db.Column(db.Integer, db.ForeignKey('tag.id'))  # 所属标签
+    area = db.Column(db.String(255))  # 上映地区
+    release_time = db.Column(db.Date)  # 上映时间
+    length = db.Column(db.String(100))  # 电影播放时间长度
+    addtime = db.Column(db.DateTime, index=True, default=datetime.now)  # 添加时间
+    comments = db.relationship('Comment', backref='movie')  # 评论外键关系关联
+    moviecols = db.relationship('Moviecol', backref='movie')  # 电影收藏外键关系关联
+
+    def __repr__(self):
+        return '<Movie %r>' % self.title
+
+
+# 上映预告
+class Preview(db.Model):
+    __tablename__ = 'preview'
+    id = db.Column(db.Integer, primary_key=True)  # 编号
+    title = db.Column(db.String(255), unique=True)  # 标题
+    logo = db.Column(db.String(255), unique=True)  # 封面
+    addtime = db.Column(db.DateTime, index=True, default=datetime.now)  # 添加时间
+
+    def __repr__(self):
+        return '<Preview %r>' % self.title
+
+
 if __name__ == '__main__':
     # 删除表
     db.drop_all()
