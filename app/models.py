@@ -195,11 +195,19 @@ class Oplog(db.Model):
         return '<Oplog %r>' % self.id
 
 
-if __name__ == '__main__':
-    # 删除表
-    db.drop_all()
-
-    # 创建表
-    db.create_all()
-
-    app.run(debug=True)
+# 执行创建表语句
+# if __name__ == '__main__':
+#     # 删除表
+#     db.drop_all()
+#
+#     # 创建表
+#     db.create_all()
+#
+#     role = Role(
+#         name="超级管理员",
+#         auths=""
+#     )
+#     db.session.add(role)
+#     db.session.commit()
+#
+#     app.run(debug=True)
