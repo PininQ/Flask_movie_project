@@ -15,15 +15,14 @@
         .navbar-brand>img {
             display: inline;
         }
-
-    </style>
-    <style>
         .media{
             padding:3px;
             border:1px solid #ccc
         }
-
     </style>
+    {% block css %}
+        {#  CSS数据块  #}
+    {% endblock %}
 </head>
 
 <body>
@@ -66,7 +65,7 @@
                     <a class="curlink" href="{{ url_for('home.logout') }}"><span class="glyphicon glyphicon-log-out"></span>&nbsp;退出</a>
                 </li>
                 <li>
-                    <a class="curlink" href="user.html"><span class="glyphicon glyphicon-user"></span>&nbsp;会员</a>
+                    <a class="curlink" href="{{ url_for('home.user') }}"><span class="glyphicon glyphicon-user"></span>&nbsp;会员</a>
                 </li>
             </ul>
         </div>
@@ -88,7 +87,7 @@
         <div class="row">
             <div class="col-md-12">
                 <p>
-                    ©&nbsp;2017&nbsp;flaskmovie.imooc.com&nbsp;京ICP备 13046642号-2
+                    ©&nbsp;2018&nbsp;flaskmovie.qinbin.com&nbsp;京ICP备 13044569号-1
                 </p>
             </div>
         </div>
@@ -113,5 +112,8 @@
         });
     });
 </script>
+{% block js %}
+{#js数据块#}
+{% endblock %}
 </body>
 </html>
