@@ -54,7 +54,7 @@ def moviecol():
     return render_template('home/moviecol.html')
 
 
-# 列表
+# 电影列表
 @home.route('/')
 def index():
     return render_template('home/index.html')
@@ -64,3 +64,9 @@ def index():
 @home.route('/animation/')
 def animation():
     return render_template('home/animation.html')
+
+
+# 电影搜索
+@home.route('/search/')
+def search():
+    return render_template('home/search.html')
