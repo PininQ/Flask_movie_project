@@ -26,7 +26,7 @@
 <body class="hold-transition skin-blue sidebar-mini">
 <div class="wrapper">
     <header class="main-header">
-        <a href="index.html" class="logo">
+        <a href="{{ url_for('admin.index') }}" class="logo">
             <span class="logo-mini"><img src="{{ url_for('static',filename='base/images/logo.png') }}" style="height:40px;width:40px;">电影系统</span>
             <span class="logo-lg"><img src="{{ url_for('static',filename='base/images/logo.png') }}" style="height:40px;width:40px;">微电影管理系统</span>
         </a>

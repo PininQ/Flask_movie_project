@@ -5,6 +5,7 @@ from flask import render_template, redirect, url_for
 
 
 # 调用蓝图(app/admin/views.py)
+# 首页系统管理
 @admin.route("/")
 def index():
     return render_template('admin/index.html')
