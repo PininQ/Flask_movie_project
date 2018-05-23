@@ -54,13 +54,13 @@ def moviecol():
     return render_template('home/moviecol.html')
 
 
-# 电影列表
+# 首页电影列表
 @home.route('/')
 def index():
     return render_template('home/index.html')
 
 
-# 动画
+# 首页轮播动画
 @home.route('/animation/')
 def animation():
     return render_template('home/animation.html')
