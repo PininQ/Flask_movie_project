@@ -5,11 +5,6 @@ from flask import render_template, redirect, url_for
 
 
 # 调用蓝图(app/home/views.py)
-@home.route("/")
-def index():
-    return render_template("home/index.html")
-
-
 # 登录
 @home.route('/login/')
 def login():
@@ -57,3 +52,27 @@ def loginlog():
 @home.route('/moviecol/')
 def moviecol():
     return render_template('home/moviecol.html')
+
+
+# 首页电影列表
+@home.route('/')
+def index():
+    return render_template('home/index.html')
+
+
+# 首页轮播动画
+@home.route('/animation/')
+def animation():
+    return render_template('home/animation.html')
+
+
+# 电影搜索
+@home.route('/search/')
+def search():
+    return render_template('home/search.html')
+
+
+# 电影详情
+@home.route('/play/')
+def play():
+    return render_template('home/play.html')
