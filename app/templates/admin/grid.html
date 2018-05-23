@@ -14,20 +14,20 @@
             </li>
         </ul>
     </li>
-    <li class="treeview">
+    <li class="treeview" id="g-2">
         <a href="#">
             <i class="fa fa-tags" aria-hidden="true"></i>
             <span>标签管理</span>
             <span class="label label-primary pull-right">2</span>
         </a>
         <ul class="treeview-menu">
-            <li>
-                <a href="tag_add.html">
+            <li id="g-2-1">
+                <a href="{{ url_for('admin.tag_add') }}">
                     <i class="fa fa-circle-o"></i> 添加标签
                 </a>
             </li>
-            <li>
-                <a href="tag_list.html">
+            <li id="g-2-2">
+                <a href="{{ url_for('admin.tag_list') }}">
                     <i class="fa fa-circle-o"></i> 标签列表
                 </a>
             </li>
