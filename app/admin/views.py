@@ -65,13 +65,19 @@ def preview_list():
     return render_template('admin/preview_list.html')
 
 
-# 添加上映预告
+# 会员列表
 @admin.route("/user/list/")
 def user_list():
     return render_template('admin/user_list.html')
 
 
-# 上映预告列表
+# 查看会员
 @admin.route("/user/view/")
 def user_view():
     return render_template('admin/user_view.html')
+
+
+# 评论列表
+@admin.route("/comment/list/")
+def comment_list():
+    return render_template('admin/comment_list.html')
