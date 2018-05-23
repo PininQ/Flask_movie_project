@@ -83,7 +83,25 @@ def comment_list():
     return render_template('admin/comment_list.html')
 
 
-# 评论列表
+# 电影收藏
 @admin.route("/moviecol/list/")
 def moviecol_list():
     return render_template('admin/moviecol_list.html')
+
+
+# 操作日志管理
+@admin.route("/oplog/list/")
+def oplog_list():
+    return render_template('admin/oplog_list.html')
+
+
+# 管理员登录日志列表
+@admin.route("/adminloginlog/list/")
+def adminloginlog_list():
+    return render_template('admin/adminloginlog_list.html')
+
+
+# 会员登录日志列表
+@admin.route("/userloginlog/list/")
+def userloginlog_list():
+    return render_template('admin/userloginlog_list.html')
