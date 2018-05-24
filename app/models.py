@@ -1,22 +1,12 @@
 # -*- coding: utf-8 -*-
 __author__ = 'QB'
 
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-
-app = Flask(__name__)
-
-# 配置数据库跟踪地址
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:qiu66666@127.0.0.1:3306/movie'
-# 跟踪数据库的修改 --> 不建议开启 未来的版本中会移除
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-
-db = SQLAlchemy(app)
+from app import db
 
 
-# 会员数据模型
 class User(db.Model):
+    """会员数据模型"""
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)  # 编号
     name = db.Column(db.String(100), unique=True)  # 昵称
@@ -35,9 +25,13 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.name
 
+    def check_pwd(self, pwd):
+        from werkzeug.security import check_password_hash
+        return check_password_hash(self.pwd, pwd)
 
-# 会员登录日志数据模型
+
 class Userlog(db.Model):
+    """会员登录日志数据模型"""
     __tablename__ = 'userlog'
     id = db.Column(db.Integer, primary_key=True)  # 编号
     # （下面是设置外键的第一步）:指向user表的id字段
@@ -49,8 +43,8 @@ class Userlog(db.Model):
         return '<Userlog %r>' % self.id
 
 
-# 标签
 class Tag(db.Model):
+    """标签数据模型"""
     __tablename__ = 'tag'
     id = db.Column(db.Integer, primary_key=True)  # 编号
     name = db.Column(db.String(100), unique=True)  # 标题
@@ -62,8 +56,8 @@ class Tag(db.Model):
         return '<Tag %r>' % self.name
 
 
-# 电影
 class Movie(db.Model):
+    """电影数据模型"""
     __tablename__ = 'movie'
     id = db.Column(db.Integer, primary_key=True)  # 编号
     title = db.Column(db.String(255), unique=True)  # 标题
@@ -86,8 +80,8 @@ class Movie(db.Model):
         return '<Movie %r>' % self.title
 
 
-# 上映预告
 class Preview(db.Model):
+    """上映预告数据模型"""
     __tablename__ = 'preview'
     id = db.Column(db.Integer, primary_key=True)  # 编号
     title = db.Column(db.String(255), unique=True)  # 标题
@@ -98,8 +92,8 @@ class Preview(db.Model):
         return '<Preview %r>' % self.title
 
 
-# 评论
 class Comment(db.Model):
+    """评论数据模型"""
     __tablename__ = 'comment'
     id = db.Column(db.Integer, primary_key=True)  # 编号
     content = db.Column(db.Text)  # 评论内容
@@ -112,8 +106,8 @@ class Comment(db.Model):
         return '<Comment %r>' % self.id
 
 
-# 电影收藏
 class Moviecol(db.Model):
+    """电影收藏数据模型"""
     __tablename__ = 'moviecol'
     id = db.Column(db.Integer, primary_key=True)  # 编号
     # 关联外键第一步，还要去user表和movie表进行第二步
@@ -125,8 +119,8 @@ class Moviecol(db.Model):
         return '<Moviecol %r>' % self.id
 
 
-# 权限
 class Auth(db.Model):
+    """权限数据模型"""
     __tablename__ = 'auth'
     id = db.Column(db.Integer, primary_key=True)  # 编号
     name = db.Column(db.String(100), unique=True)  # 名称
@@ -137,8 +131,8 @@ class Auth(db.Model):
         return '<Auth %r>' % self.name
 
 
-# 角色
 class Role(db.Model):
+    """角色数据模型"""
     __tablename__ = 'role'
     id = db.Column(db.Integer, primary_key=True)  # 编号
     name = db.Column(db.String(100), unique=True)  # 名称
@@ -150,8 +144,8 @@ class Role(db.Model):
         return '<Role %r>' % self.name
 
 
-# 管理员
 class Admin(db.Model):
+    """管理员数据模型"""
     __tablename__ = 'admin'
     id = db.Column(db.Integer, primary_key=True)  # 编号
     name = db.Column(db.String(100), unique=True)  # 管理员账号
@@ -167,11 +161,11 @@ class Admin(db.Model):
 
     def check_pwd(self, pwd):
         from werkzeug.security import check_password_hash
-        return check_password_hash(self, pwd)
+        return check_password_hash(self.pwd, pwd)
 
 
-# 管理员登录日志
 class Adminlog(db.Model):
+    """管理员登录日志数据模型"""
     __tablename__ = 'adminlog'
     id = db.Column(db.Integer, primary_key=True)  # 编号
     admin_id = db.Column(db.Integer, db.ForeignKey('admin.id'))  # 所属管理员
@@ -182,8 +176,8 @@ class Adminlog(db.Model):
         return '<Adminlog %r>' % self.id
 
 
-# 管理员操作日志
 class Oplog(db.Model):
+    """管理员操作日志数据模型"""
     __tablename__ = 'oplog'
     id = db.Column(db.Integer, primary_key=True)  # 编号
     admin_id = db.Column(db.Integer, db.ForeignKey('admin.id'))  # 所属管理员
@@ -195,29 +189,30 @@ class Oplog(db.Model):
         return '<Oplog %r>' % self.id
 
 
-# 执行创建表语句
+# # 执行创建表语句
 # if __name__ == '__main__':
-    # # 删除表
-    # db.drop_all()
-    #
-    # # 创建表
-    # db.create_all()
-    #
-    # role = Role(
-    #     name="超级管理员",
-    #     auths=""
-    # )
-    # db.session.add(role)
-    # db.session.commit()
-
-    # from werkzeug.security import generate_password_hash
-    # admin = Admin(
-    #     name="movie",
-    #     pwd=generate_password_hash("movie"),
-    #     is_super=0,
-    #     role_id=1
-    # )
-    # db.session.add(admin)
-    # db.session.commit()
-    #
-    # app.run(debug=True)
+#     # 删除表
+#     db.drop_all()
+#
+#     # 创建表
+#     db.create_all()
+#
+#     role = Role(
+#         name="超级管理员",
+#         auths=""
+#     )
+#     db.session.add(role)
+#     db.session.commit()
+#
+#     from werkzeug.security import generate_password_hash
+#
+#     admin = Admin(
+#         name="movie",
+#         pwd=generate_password_hash("movie"),
+#         is_super=0,
+#         role_id=1
+#     )
+#     db.session.add(admin)
+#     db.session.commit()
+#
+#     app.run(debug=True)

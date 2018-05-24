@@ -5,74 +5,74 @@ from flask import render_template, redirect, url_for
 
 
 # 调用蓝图(app/home/views.py)
-# 登录
 @home.route('/login/')
 def login():
+    """登录"""
     return render_template('home/login.html')
 
 
-# 退出
 @home.route('/logout/')
 def logout():
+    """退出"""
     # 重定向到home模块下的登录
     return redirect(url_for('home.login'))
 
 
-# 注册
 @home.route('/register/')
 def register():
+    """注册"""
     return render_template('home/register.html')
 
 
-# 会员中心
 @home.route('/user/')
 def user():
+    """会员中心"""
     return render_template('home/user.html')
 
 
-# 修改密码
 @home.route('/pwd/')
 def pwd():
+    """修改密码"""
     return render_template('home/pwd.html')
 
 
-# 评论记录
 @home.route('/comments/')
 def comments():
+    """评论记录"""
     return render_template('home/comments.html')
 
 
-# 登录日志
 @home.route('/loginlog/')
 def loginlog():
+    """登录日志"""
     return render_template('home/loginlog.html')
 
 
-# 收藏电影
 @home.route('/moviecol/')
 def moviecol():
+    """收藏电影"""
     return render_template('home/moviecol.html')
 
 
-# 首页电影列表
 @home.route('/')
 def index():
+    """首页电影列表"""
     return render_template('home/index.html')
 
 
-# 首页轮播动画
 @home.route('/animation/')
 def animation():
+    """首页轮播动画"""
     return render_template('home/animation.html')
 
 
-# 电影搜索
 @home.route('/search/')
 def search():
+    """电影搜索"""
     return render_template('home/search.html')
 
 
-# 电影详情
 @home.route('/play/')
 def play():
+    """电影详情"""
     return render_template('home/play.html')

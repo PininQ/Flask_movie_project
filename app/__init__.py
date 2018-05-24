@@ -2,9 +2,16 @@
 __author__ = 'QB'
 
 from flask import Flask, render_template
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+# 配置数据库跟踪地址
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:qiu66666@127.0.0.1:3306/movie'
+# 跟踪数据库的修改 --> 不建议开启 未来的版本中会移除
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['SECRET_KEY'] = 'qinbin'
 app.debug = True
+db = SQLAlchemy(app)
 
 # 注册蓝图(app/__init__.py)
 from app.home import home as home_blueprint
