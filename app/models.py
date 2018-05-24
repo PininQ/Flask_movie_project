@@ -1,18 +1,8 @@
 # -*- coding: utf-8 -*-
 __author__ = 'QB'
 
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-
-app = Flask(__name__)
-
-# 配置数据库跟踪地址
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:qiu66666@127.0.0.1:3306/movie'
-# 跟踪数据库的修改 --> 不建议开启 未来的版本中会移除
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-
-db = SQLAlchemy(app)
+from app import db
 
 
 class User(db.Model):
@@ -34,6 +24,10 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.name
+
+    def check_pwd(self, pwd):
+        from werkzeug.security import check_password_hash
+        return check_password_hash(self.pwd, pwd)
 
 
 class Userlog(db.Model):
@@ -167,7 +161,7 @@ class Admin(db.Model):
 
     def check_pwd(self, pwd):
         from werkzeug.security import check_password_hash
-        return check_password_hash(self, pwd)
+        return check_password_hash(self.pwd, pwd)
 
 
 class Adminlog(db.Model):
@@ -195,29 +189,30 @@ class Oplog(db.Model):
         return '<Oplog %r>' % self.id
 
 
-# 执行创建表语句
+# # 执行创建表语句
 # if __name__ == '__main__':
-    # # 删除表
-    # db.drop_all()
-    #
-    # # 创建表
-    # db.create_all()
-    #
-    # role = Role(
-    #     name="超级管理员",
-    #     auths=""
-    # )
-    # db.session.add(role)
-    # db.session.commit()
-
-    # from werkzeug.security import generate_password_hash
-    # admin = Admin(
-    #     name="movie",
-    #     pwd=generate_password_hash("movie"),
-    #     is_super=0,
-    #     role_id=1
-    # )
-    # db.session.add(admin)
-    # db.session.commit()
-    #
-    # app.run(debug=True)
+#     # 删除表
+#     db.drop_all()
+#
+#     # 创建表
+#     db.create_all()
+#
+#     role = Role(
+#         name="超级管理员",
+#         auths=""
+#     )
+#     db.session.add(role)
+#     db.session.commit()
+#
+#     from werkzeug.security import generate_password_hash
+#
+#     admin = Admin(
+#         name="movie",
+#         pwd=generate_password_hash("movie"),
+#         is_super=0,
+#         role_id=1
+#     )
+#     db.session.add(admin)
+#     db.session.commit()
+#
+#     app.run(debug=True)
