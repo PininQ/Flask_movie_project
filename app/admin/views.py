@@ -3,7 +3,7 @@ __author__ = 'QB'
 from . import admin
 from flask import render_template, redirect, url_for, flash, session, request
 from app.admin.forms import LoginForm, TagForm, MovieForm, PreviewForm
-from app.models import Admin, Tag, Movie, Preview
+from app.models import Admin, Tag, Movie, Preview, User
 from functools import wraps
 from app import db, app
 from werkzeug.utils import secure_filename
@@ -122,7 +122,7 @@ def tag_list(page=None):
         page = 1
     page_data = Tag.query.order_by(
         Tag.addtime.desc()
-    ).paginate(page=page, per_page=10)
+    ).paginate(page=page, per_page=5)
     return render_template('admin/tag_list.html', page_data=page_data)
 
 
@@ -193,7 +193,7 @@ def movie_list(page=None):
         Tag.id == Movie.tag_id
     ).order_by(
         Movie.addtime.desc()
-    ).paginate(page=page, per_page=10)
+    ).paginate(page=page, per_page=5)
     return render_template('admin/movie_list.html', page_data=page_data)
 
 
@@ -299,7 +299,7 @@ def preview_list(page=None):
         page = 1
     page_data = Preview.query.order_by(
         Preview.addtime.desc()
-    ).paginate(page=page, per_page=6)
+    ).paginate(page=page, per_page=5)
     return render_template('admin/preview_list.html', page_data=page_data)
 
 
@@ -348,18 +348,45 @@ def preview_edit(id=None):
     return render_template('admin/preview_edit.html', form=form, preview=preview)
 
 
-@admin.route("/user/list/")
+@admin.route("/user/list/<int:page>", methods=['GET'])
 @admin_login_req
-def user_list():
+def user_list(page=None):
     """会员列表"""
-    return render_template('admin/user_list.html')
+    if page is None:
+        page = 1
+    page_data = User.query.order_by(
+        User.addtime.desc()
+    ).paginate(page=page, per_page=5)
+    return render_template('admin/user_list.html', page_data=page_data)
 
 
-@admin.route("/user/view/")
+@admin.route("/user/view/<int:id>", methods=['GET'])
 @admin_login_req
-def user_view():
+def user_view(id=None):
     """查看会员"""
-    return render_template('admin/user_view.html')
+    pre_page = request.args.get('pre_page')
+    # 兼容不加参数的无来源页面访问。
+    if not pre_page:
+        pre_page = 1
+    user = User.query.get_or_404(int(id))
+    # 通过form_page参数实现返回原来的page
+    return render_template('admin/user_view.html', user=user, pre_page=pre_page)
+
+
+@admin.route("/user/del/<int:id>", methods=['GET'])
+@admin_login_req
+def user_del(id=None):
+    """会员删除"""
+    # 假如删除当前页是最后一页
+    pre_page = int(request.args.get('pre_page')) - 1
+    # 此处考虑全删完了，没法前挪的情况，0被视为false
+    if not pre_page:
+        pre_page = 1
+    user = User.query.get_or_404(int(id))
+    db.session.delete(user)
+    db.session.commit()
+    flash("删除会员成功！", 'ok')
+    return redirect(url_for('admin.user_list', page=pre_page))
 
 
 @admin.route("/comment/list/")
