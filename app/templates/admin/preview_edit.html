@@ -6,7 +6,7 @@
         <h1>微电影管理系统</h1>
         <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> 预告管理</a></li>
-            <li class="active">添加预告</li>
+            <li class="active">修改预告</li>
         </ol>
     </section>
     <section class="content" id="showcontent">
@@ -14,7 +14,7 @@
             <div class="col-md-12">
                 <div class="box box-primary">
                     <div class="box-header with-border">
-                        <h3 class="box-title">添加预告</h3>
+                        <h3 class="box-title">修改预告</h3>
                     </div>
                     <form role="form" method="post" enctype="multipart/form-data">
                         <div class="box-body">
@@ -36,7 +36,7 @@
                             {% endfor %}
                             <div class="form-group">
                                 <label for="input_title">{{ form.title.label }}</label>
-                                {{ form.title }}
+                                {{ form.title(value=preview.title) }}
                                 {% for err in form.title.errors %}
                                     <div class="col-md-12">
                                         <p style="color: red">{{ err }}</p>
@@ -51,7 +51,7 @@
                                         <p style="color: red">{{ err }}</p>
                                     </div>
                                 {% endfor %}
-                                <img data-src="holder.js/700x320" style="margin-top:5px;" class="img-responsive"
+                                <img src="{{ url_for('static',filename='uploads/'+ preview.logo) }}" style="margin-top:5px;width: 387px;height: 250px" class="img-responsive"
                                      alt="">
                             </div>
                         </div>

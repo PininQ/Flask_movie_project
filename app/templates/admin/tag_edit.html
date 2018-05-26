@@ -36,6 +36,8 @@
                             <div class="form-group">
                                 <label for="input_name">{{ form.name.label }}</label>
                                 {{ form.name(value=tag.name) }}
+                                {#隐藏的字段#}
+                                <input name="id" value="{{ tag.id }}" type="hidden">
                                 {% for err in form.name.errors %}
                                     <div class="col-md-12">
                                         <p style="color: red">{{ err }}</p>

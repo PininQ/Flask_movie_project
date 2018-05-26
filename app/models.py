@@ -61,9 +61,9 @@ class Movie(db.Model):
     __tablename__ = 'movie'
     id = db.Column(db.Integer, primary_key=True)  # 编号
     title = db.Column(db.String(255), unique=True)  # 标题
-    url = db.Column(db.String(255), unique=True)  # 地址
+    url = db.Column(db.String(255), unique=True)  # 文件地址
     info = db.Column(db.Text)  # 电影简介
-    logo = db.Column(db.String(255), unique=True)  # 封面
+    logo = db.Column(db.String(255), unique=True)  # 封面地址
     star = db.Column(db.SmallInteger)  # 星级
     playnum = db.Column(db.BigInteger)  # 播放量
     commentnum = db.Column(db.BigInteger)  # 评论量

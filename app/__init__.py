@@ -3,6 +3,7 @@ __author__ = 'QB'
 
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
+import os
 
 app = Flask(__name__)
 # 配置数据库跟踪地址
@@ -10,6 +11,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:qiu66666@127.0.0.1:3306/mo
 # 跟踪数据库的修改 --> 不建议开启 未来的版本中会移除
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SECRET_KEY'] = 'qinbin'
+app.config['UP_DIR'] = os.path.join(os.path.abspath(os.path.dirname(__file__)), "static/uploads/")
 app.debug = True
 db = SQLAlchemy(app)
 
