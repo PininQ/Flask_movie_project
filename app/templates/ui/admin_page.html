@@ -10,10 +10,12 @@
             {% endif %}
 
             {% for v in data.iter_pages() %}
-                {% if v == data.page %}
-                    <li class="active"><a href="#">{{ v }}</a></li>
-                {% else %}
-                    <li><a href="{{ url_for(url,page=v) }}">{{ v }}</a></li>
+                {% if v %}
+                    {% if v == data.page %}
+                        <li class="active"><a href="#">{{ v }}</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for(url,page=v) }}">{{ v }}</a></li>
+                    {% endif %}
                 {% endif %}
             {% endfor %}
 

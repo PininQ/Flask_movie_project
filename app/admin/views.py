@@ -3,7 +3,7 @@ __author__ = 'QB'
 from . import admin
 from flask import render_template, redirect, url_for, flash, session, request
 from app.admin.forms import LoginForm, TagForm, MovieForm, PreviewForm
-from app.models import Admin, Tag, Movie, Preview, User
+from app.models import Admin, Tag, Movie, Preview, User, Comment
 from functools import wraps
 from app import db, app
 from werkzeug.utils import secure_filename
@@ -189,7 +189,9 @@ def movie_list(page=None):
     if page is None:
         page = 1
     # 关联Tag的查询,单表查询使用filter_by 多表查询使用filter进行关联字段
-    page_data = Movie.query.join(Tag).filter(
+    page_data = Movie.query.join(
+        Tag
+    ).filter(
         Tag.id == Movie.tag_id
     ).order_by(
         Movie.addtime.desc()
@@ -389,11 +391,44 @@ def user_del(id=None):
     return redirect(url_for('admin.user_list', page=pre_page))
 
 
-@admin.route("/comment/list/")
+@admin.route("/comment/list/<int:page>", methods=['GET'])
 @admin_login_req
-def comment_list():
+def comment_list(page=None):
     """评论列表"""
-    return render_template('admin/comment_list.html')
+    if page is None:
+        page = 1
+    # 通过join关联movie和user，然后过滤movie_id和user_id
+    page_data = Comment.query.join(
+        Movie
+    ).join(
+        User
+    ).filter(
+        Movie.id == Comment.movie_id,
+        User.id == Comment.user_id
+    ).order_by(
+        Comment.addtime.desc()
+    ).paginate(page=page, per_page=2)
+    return render_template('admin/comment_list.html', page_data=page_data)
+
+
+@admin.route("/comment/del/<int:id>", methods=['GET'])
+@admin_login_req
+def comment_del(id=None):
+    """删除评论"""
+    comment_count = Comment.query.count()
+    # 假如删除当前页是最后一页
+    pre_page = int(request.args.get('pre_page')) - 1
+    # 此处考虑全删完了，没法前挪的情况，0被视为false
+    if not pre_page:
+        pre_page = 1
+    elif (comment_count % 2 - 1) != 0:
+        pre_page = int(request.args.get('pre_page'))
+    # print(comment_count)
+    comment = Comment.query.get_or_404(int(id))
+    db.session.delete(comment)
+    db.session.commit()
+    flash("删除评论成功！", 'ok')
+    return redirect(url_for('admin.comment_list', page=pre_page))
 
 
 @admin.route("/moviecol/list/")
