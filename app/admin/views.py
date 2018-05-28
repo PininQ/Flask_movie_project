@@ -3,7 +3,7 @@ __author__ = 'QB'
 from . import admin
 from flask import render_template, redirect, url_for, flash, session, request
 from app.admin.forms import LoginForm, TagForm, MovieForm, PreviewForm
-from app.models import Admin, Tag, Movie, Preview, User, Comment
+from app.models import Admin, Tag, Movie, Preview, User, Comment, Moviecol
 from functools import wraps
 from app import db, app
 from werkzeug.utils import secure_filename
@@ -12,7 +12,7 @@ import uuid
 from datetime import datetime
 
 # 分页个数
-PAGE_COUNT = 5
+PAGE_COUNT = 3
 
 
 def admin_login_req(f):
@@ -437,11 +437,35 @@ def comment_del(id=None):
     return redirect(url_for('admin.comment_list', page=pre_page))
 
 
-@admin.route("/moviecol/list/")
+@admin.route("/moviecol/list/<int:page>", methods=['GET'])
 @admin_login_req
-def moviecol_list():
-    """电影收藏"""
-    return render_template('admin/moviecol_list.html')
+def moviecol_list(page=None):
+    """电影收藏列表"""
+    if page is None:
+        page = 1
+    page_data = Moviecol.query.join(
+        Movie
+    ).join(
+        User
+    ).filter(
+        Movie.id == Moviecol.movie_id,
+        User.id == Moviecol.user_id
+    ).order_by(
+        Moviecol.addtime.desc()
+    ).paginate(page=page, per_page=PAGE_COUNT)
+    return render_template('admin/moviecol_list.html', page_data=page_data)
+
+
+@admin.route("/moviecol/del/<int:id>", methods=['GET'])
+@admin_login_req
+def moviecol_del(id=None):
+    """删除电影收藏"""
+    pre_page = admin_page(Moviecol)
+    moviecol = Moviecol.query.get_or_404(int(id))
+    db.session.delete(moviecol)
+    db.session.commit()
+    flash("删除电影收藏成功！", 'ok')
+    return redirect(url_for('admin.moviecol_list', page=pre_page))
 
 
 @admin.route("/oplog/list/")
