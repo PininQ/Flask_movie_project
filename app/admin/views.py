@@ -2,8 +2,8 @@
 __author__ = 'QB'
 from . import admin
 from flask import render_template, redirect, url_for, flash, session, request
-from app.admin.forms import LoginForm, TagForm, MovieForm, PreviewForm, PwdForm
-from app.models import Admin, Tag, Movie, Preview, User, Comment, Moviecol
+from app.admin.forms import LoginForm, TagForm, MovieForm, PreviewForm, PwdForm, AuthForm, RoleForm, AdminForm
+from app.models import Admin, Tag, Movie, Preview, User, Comment, Moviecol, Oplog, Adminlog, Userlog, Auth, Role
 from functools import wraps
 from app import db, app
 from werkzeug.utils import secure_filename
@@ -13,6 +13,24 @@ from datetime import datetime
 
 # 分页个数
 PAGE_COUNT = 3
+
+
+@admin.context_processor
+def tpl_extra():
+    """
+    上下应用处理器
+    """
+    data = dict(
+        online_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    )
+    return data
+
+
+def change_filename(filename):
+    """修改文件名称"""
+    fileinfo = os.path.splitext(filename)
+    filename = datetime.now().strftime("%Y%m%d%H%M%S") + str(uuid.uuid4().hex) + fileinfo[-1]
+    return filename
 
 
 def admin_login_req(f):
@@ -25,13 +43,6 @@ def admin_login_req(f):
         return f(*args, **kwargs)
 
     return decorated_function
-
-
-def change_filename(filename):
-    """修改文件名称"""
-    fileinfo = os.path.splitext(filename)
-    filename = datetime.now().strftime("%Y%m%d%H%M%S") + str(uuid.uuid4().hex) + fileinfo[-1]
-    return filename
 
 
 def admin_page(model_name):
@@ -67,6 +78,13 @@ def login():
             return redirect(url_for('admin.login'))
         # 定义session保存会话
         session['admin'] = data['account']
+        session["admin_id"] = admin.id
+        adminlog = Adminlog(
+            admin_id=admin.id,
+            ip=request.remote_addr
+        )
+        db.session.add(adminlog)
+        db.session.commit()
         return redirect(request.args.get('next') or url_for('admin.index'))
     return render_template('admin/login.html', form=form)
 
@@ -76,6 +94,7 @@ def login():
 def logout():
     """退出登录"""
     session.pop('admin', None)
+    session.pop("admin_id", None)
     return redirect(url_for('admin.login'))
 
 
@@ -113,12 +132,20 @@ def tag_add():
         )
         db.session.add(tag)
         db.session.commit()
+        oplog = Oplog(
+            admin_id=session['admin_id'],
+            # 获取ip地址
+            ip=request.remote_addr,
+            reason='添加一个标签《%s》' % data['name']
+        )
+        db.session.add(oplog)
+        db.session.commit()
         flash("标签添加成功！", "ok")
         redirect(url_for('admin.tag_add'))
     return render_template('admin/tag_add.html', form=form)
 
 
-@admin.route("/tag/edit/<int:id>", methods=['GET', 'POST'])
+@admin.route("/tag/edit/<int:id>/", methods=['GET', 'POST'])
 @admin_login_req
 def tag_edit(id=None):
     """标签编辑"""
@@ -139,7 +166,7 @@ def tag_edit(id=None):
     return render_template('admin/tag_edit.html', form=form, tag=tag)
 
 
-@admin.route("/tag/list/<int:page>", methods=['GET'])
+@admin.route("/tag/list/<int:page>/", methods=['GET'])
 @admin_login_req
 def tag_list(page=None):
     """标签列表"""
@@ -151,7 +178,7 @@ def tag_list(page=None):
     return render_template('admin/tag_list.html', page_data=page_data)
 
 
-@admin.route("/tag/del/<int:id>", methods=['GET'])
+@admin.route("/tag/del/<int:id>/", methods=['GET'])
 @admin_login_req
 def tag_del(id=None):
     """标签删除"""
@@ -208,7 +235,7 @@ def movie_add():
     return render_template('admin/movie_add.html', form=form)
 
 
-@admin.route("/movie/list/<int:page>", methods=['GET'])
+@admin.route("/movie/list/<int:page>/", methods=['GET'])
 @admin_login_req
 def movie_list(page=None):
     """电影列表"""
@@ -225,7 +252,7 @@ def movie_list(page=None):
     return render_template('admin/movie_list.html', page_data=page_data)
 
 
-@admin.route("/movie/del/<int:id>", methods=['GET'])
+@admin.route("/movie/del/<int:id>/", methods=['GET'])
 @admin_login_req
 def movie_del(id=None):
     """电影删除"""
@@ -237,7 +264,7 @@ def movie_del(id=None):
     return redirect(url_for('admin.movie_list', page=pre_page))
 
 
-@admin.route("/movie/edit/<int:id>", methods=['GET', 'POST'])
+@admin.route("/movie/edit/<int:id>/", methods=['GET', 'POST'])
 @admin_login_req
 def movie_edit(id=None):
     """电影编辑"""
@@ -320,7 +347,7 @@ def preview_add():
     return render_template('admin/preview_add.html', form=form)
 
 
-@admin.route("/preview/list/<int:page>", methods=['GET'])
+@admin.route("/preview/list/<int:page>/", methods=['GET'])
 @admin_login_req
 def preview_list(page=None):
     """上映预告列表"""
@@ -332,7 +359,7 @@ def preview_list(page=None):
     return render_template('admin/preview_list.html', page_data=page_data)
 
 
-@admin.route("/preview/del/<int:id>", methods=['GET'])
+@admin.route("/preview/del/<int:id>/", methods=['GET'])
 @admin_login_req
 def preview_del(id=None):
     """上映预告删除"""
@@ -344,7 +371,7 @@ def preview_del(id=None):
     return redirect(url_for('admin.preview_list', page=pre_page))
 
 
-@admin.route("/preview/edit/<int:id>", methods=['GET', 'POST'])
+@admin.route("/preview/edit/<int:id>/", methods=['GET', 'POST'])
 @admin_login_req
 def preview_edit(id=None):
     """上映预告编辑"""
@@ -378,7 +405,7 @@ def preview_edit(id=None):
     return render_template('admin/preview_edit.html', form=form, preview=preview)
 
 
-@admin.route("/user/list/<int:page>", methods=['GET'])
+@admin.route("/user/list/<int:page>/", methods=['GET'])
 @admin_login_req
 def user_list(page=None):
     """会员列表"""
@@ -390,7 +417,7 @@ def user_list(page=None):
     return render_template('admin/user_list.html', page_data=page_data)
 
 
-@admin.route("/user/view/<int:id>", methods=['GET'])
+@admin.route("/user/view/<int:id>/", methods=['GET'])
 @admin_login_req
 def user_view(id=None):
     """查看会员"""
@@ -403,7 +430,7 @@ def user_view(id=None):
     return render_template('admin/user_view.html', user=user, pre_page=pre_page)
 
 
-@admin.route("/user/del/<int:id>", methods=['GET'])
+@admin.route("/user/del/<int:id>/", methods=['GET'])
 @admin_login_req
 def user_del(id=None):
     """会员删除"""
@@ -415,7 +442,7 @@ def user_del(id=None):
     return redirect(url_for('admin.user_list', page=pre_page))
 
 
-@admin.route("/comment/list/<int:page>", methods=['GET'])
+@admin.route("/comment/list/<int:page>/", methods=['GET'])
 @admin_login_req
 def comment_list(page=None):
     """评论列表"""
@@ -435,7 +462,7 @@ def comment_list(page=None):
     return render_template('admin/comment_list.html', page_data=page_data)
 
 
-@admin.route("/comment/del/<int:id>", methods=['GET'])
+@admin.route("/comment/del/<int:id>/", methods=['GET'])
 @admin_login_req
 def comment_del(id=None):
     """删除评论"""
@@ -447,7 +474,7 @@ def comment_del(id=None):
     return redirect(url_for('admin.comment_list', page=pre_page))
 
 
-@admin.route("/moviecol/list/<int:page>", methods=['GET'])
+@admin.route("/moviecol/list/<int:page>/", methods=['GET'])
 @admin_login_req
 def moviecol_list(page=None):
     """电影收藏列表"""
@@ -466,7 +493,7 @@ def moviecol_list(page=None):
     return render_template('admin/moviecol_list.html', page_data=page_data)
 
 
-@admin.route("/moviecol/del/<int:id>", methods=['GET'])
+@admin.route("/moviecol/del/<int:id>/", methods=['GET'])
 @admin_login_req
 def moviecol_del(id=None):
     """删除电影收藏"""
@@ -478,25 +505,53 @@ def moviecol_del(id=None):
     return redirect(url_for('admin.moviecol_list', page=pre_page))
 
 
-@admin.route("/oplog/list/")
+@admin.route("/oplog/list/<int:page>/", methods=['GET'])
 @admin_login_req
-def oplog_list():
+def oplog_list(page=None):
     """操作日志管理"""
-    return render_template('admin/oplog_list.html')
+    if page is None:
+        page = 1
+    page_data = Oplog.query.join(
+        Admin
+    ).filter(
+        Admin.id == Oplog.admin_id
+    ).order_by(
+        Oplog.addtime.desc()
+    ).paginate(page=page, per_page=PAGE_COUNT)
+    return render_template('admin/oplog_list.html', page_data=page_data)
 
 
-@admin.route("/adminloginlog/list/")
+# 不知道为什么这里必须在路径结尾加上/，否则出现404，索性给所有的路径的结尾都加上了/
+@admin.route("/adminloginlog/list/<int:page>/", methods=['GET'])
 @admin_login_req
-def adminloginlog_list():
+def adminloginlog_list(page=None):
     """管理员登录日志列表"""
-    return render_template('admin/adminloginlog_list.html')
+    if page is None:
+        page = 1
+    page_data = Adminlog.query.join(
+        Admin
+    ).filter(
+        Admin.id == Adminlog.admin_id
+    ).order_by(
+        Adminlog.addtime.desc()
+    ).paginate(page=page, per_page=PAGE_COUNT)
+    return render_template('admin/adminloginlog_list.html', page_data=page_data)
 
 
-@admin.route("/userloginlog/list/")
+@admin.route("/userloginlog/list/<int:page>/", methods=["GET"])
 @admin_login_req
-def userloginlog_list():
+def userloginlog_list(page=None):
     """会员登录日志列表"""
-    return render_template('admin/userloginlog_list.html')
+    if page is None:
+        page = 1
+    page_data = Userlog.query.join(
+        User
+    ).filter(
+        User.id == Userlog.user_id,
+    ).order_by(
+        Userlog.addtime.desc()
+    ).paginate(page=page, per_page=PAGE_COUNT)
+    return render_template("admin/userloginlog_list.html", page_data=page_data)
 
 
 @admin.route("/auth/add/")

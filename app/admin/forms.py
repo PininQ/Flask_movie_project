@@ -246,3 +246,15 @@ class PwdForm(FlaskForm):
         # check_pwd方法进行密码校验
         if not admin.check_pwd(pwd):
             raise ValidationError('旧密码错误！')
+
+
+class AuthForm(FlaskForm):
+    pass
+
+
+class RoleForm(FlaskForm):
+    pass
+
+
+class AdminForm(FlaskForm):
+    pass
