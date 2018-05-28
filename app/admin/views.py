@@ -662,19 +662,80 @@ def auth_edit(id=None):
 
 
 # 添加角色
-@admin.route("/role/add/")
+@admin.route("/role/add/", methods=['GET', 'POST'])
 @admin_login_req
 def role_add():
     """添加角色"""
-    return render_template("admin/role_add.html")
+    form = RoleForm()
+    if form.validate_on_submit():
+        data = form.data
+        name_count = Role.query.filter_by(name=data["name"]).count()
+        if name_count == 1:
+            flash("角色名称已经存在，请重新编辑！", "err")
+            return redirect(url_for('admin.role_add'))
+        role = Role(
+            name=data['name'],
+            # 通过map函数将数字转换称字符串进行join
+            auths=",".join(map(lambda v: str(v), data['auths']))
+        )
+        db.session.add(role)
+        db.session.commit()
+        flash('添加权限成功！', 'ok')
+        return redirect(url_for('admin.role_add'))
+    return render_template("admin/role_add.html", form=form)
 
 
 # 角色列表
-@admin.route("/role/list/")
+@admin.route("/role/list/<int:page>/", methods=['GET'])
 @admin_login_req
-def role_list():
+def role_list(page=None):
     """角色列表"""
-    return render_template("admin/role_list.html")
+    if page is None:
+        page = 1
+    page_data = Role.query.order_by(
+        Role.addtime.desc()
+    ).paginate(page=page, per_page=PAGE_COUNT)
+    return render_template("admin/role_list.html", page_data=page_data)
+
+
+# 角色删除
+@admin.route("/role/del/<int:id>/", methods=['GET'])
+@admin_login_req
+def role_del(id=None):
+    """角色删除"""
+    pre_page = admin_page(Role)
+    role = Role.query.get_or_404(int(id))
+    db.session.delete(role)
+    db.session.commit()
+    flash("角色【%s】删除成功！" % role.name, "ok")
+    return redirect(url_for('admin.role_list', page=pre_page))
+
+
+# 角色编辑
+@admin.route("/role/edit/<int:id>", methods=['GET', 'POST'])
+@admin_login_req
+def role_edit(id=None):
+    form = RoleForm()
+    form.submit.label.text = "编辑"
+    role = Role.query.get_or_404(int(id))
+    # 请求方式为GET时进行赋值。多选框无法在模板中赋初值
+    if request.method == 'GET':
+        auths = role.auths
+        # 字符串分隔成数组，转换成整型然后转换成列表
+        form.auths.data = list(map(lambda v: int(v), auths.split(',')))
+    if form.validate_on_submit():
+        data = form.data
+        name_count = Role.query.filter_by(name=data["name"]).count()
+        if role.name != data["name"] and name_count == 1:
+            flash("角色名称已经存在，请重新编辑！", "err")
+            return redirect(url_for('admin.role_edit', id=role.id))
+        role.name = data['name']
+        role.auths = ','.join(map(lambda v: str(v), data['auths']))
+        db.session.add(role)
+        db.session.commit()
+        flash("角色【%s】修改成功！" % role.name, "ok")
+        redirect(url_for('admin.role_edit', id=role.id))
+    return render_template('admin/role_edit.html', form=form, role=role)
 
 
 # 添加管理员
