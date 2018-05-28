@@ -249,7 +249,34 @@ class PwdForm(FlaskForm):
 
 
 class AuthForm(FlaskForm):
-    pass
+    name = StringField(
+        label="权限名称",
+        validators=[
+            DataRequired("权限名称不能为空！")
+        ],
+        description="权限名称",
+        render_kw={
+            "class": "form-control",
+            "placeholder": "请输入权限名称"
+        }
+    )
+    url = StringField(
+        label="权限地址",
+        validators=[
+            DataRequired("权限地址不能为空！")
+        ],
+        description="权限地址",
+        render_kw={
+            "class": "form-control",
+            "placeholder": "请输入权限地址"
+        }
+    )
+    submit = SubmitField(
+        '添加',
+        render_kw={
+            "class": "btn btn-primary",
+        }
+    )
 
 
 class RoleForm(FlaskForm):

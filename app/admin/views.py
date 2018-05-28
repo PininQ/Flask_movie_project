@@ -15,17 +15,16 @@ from datetime import datetime
 PAGE_COUNT = 3
 
 
+# 上下应用处理器
 @admin.context_processor
 def tpl_extra():
-    """
-    上下应用处理器
-    """
     data = dict(
         online_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     )
     return data
 
 
+# 修改文件名称
 def change_filename(filename):
     """修改文件名称"""
     fileinfo = os.path.splitext(filename)
@@ -33,6 +32,7 @@ def change_filename(filename):
     return filename
 
 
+# 登录装饰器
 def admin_login_req(f):
     """登录装饰器"""
 
@@ -57,7 +57,7 @@ def admin_page(model_name):
     return pre_page
 
 
-# 调用蓝图(app/admin/views.py)
+# 首页系统管理：调用蓝图(app/admin/views.py)
 @admin.route("/")
 @admin_login_req
 def index():
@@ -65,6 +65,7 @@ def index():
     return render_template('admin/index.html')
 
 
+# 后台登录
 @admin.route("/login/", methods=["GET", "POST"])
 def login():
     """后台登录"""
@@ -89,6 +90,7 @@ def login():
     return render_template('admin/login.html', form=form)
 
 
+# 退出登录
 @admin.route("/logout/")
 @admin_login_req
 def logout():
@@ -98,6 +100,7 @@ def logout():
     return redirect(url_for('admin.login'))
 
 
+# 修改密码
 @admin.route("/pwd/", methods=['GET', 'POST'])
 @admin_login_req
 def pwd():
@@ -115,6 +118,7 @@ def pwd():
     return render_template('admin/pwd.html', form=form)
 
 
+# 标签添加
 @admin.route("/tag/add/", methods=['GET', 'POST'])
 @admin_login_req
 def tag_add():
@@ -141,10 +145,11 @@ def tag_add():
         db.session.add(oplog)
         db.session.commit()
         flash("标签添加成功！", "ok")
-        redirect(url_for('admin.tag_add'))
+        return redirect(url_for('admin.tag_add'))
     return render_template('admin/tag_add.html', form=form)
 
 
+# 标签编辑
 @admin.route("/tag/edit/<int:id>/", methods=['GET', 'POST'])
 @admin_login_req
 def tag_edit(id=None):
@@ -166,6 +171,7 @@ def tag_edit(id=None):
     return render_template('admin/tag_edit.html', form=form, tag=tag)
 
 
+# 标签列表
 @admin.route("/tag/list/<int:page>/", methods=['GET'])
 @admin_login_req
 def tag_list(page=None):
@@ -178,6 +184,7 @@ def tag_list(page=None):
     return render_template('admin/tag_list.html', page_data=page_data)
 
 
+# 标签删除
 @admin.route("/tag/del/<int:id>/", methods=['GET'])
 @admin_login_req
 def tag_del(id=None):
@@ -191,6 +198,7 @@ def tag_del(id=None):
     return redirect(url_for('admin.tag_list', page=pre_page))
 
 
+# 添加电影
 @admin.route("/movie/add/", methods=['GET', 'POST'])
 @admin_login_req
 def movie_add():
@@ -235,6 +243,7 @@ def movie_add():
     return render_template('admin/movie_add.html', form=form)
 
 
+# 电影列表
 @admin.route("/movie/list/<int:page>/", methods=['GET'])
 @admin_login_req
 def movie_list(page=None):
@@ -252,6 +261,7 @@ def movie_list(page=None):
     return render_template('admin/movie_list.html', page_data=page_data)
 
 
+# 电影删除
 @admin.route("/movie/del/<int:id>/", methods=['GET'])
 @admin_login_req
 def movie_del(id=None):
@@ -264,6 +274,7 @@ def movie_del(id=None):
     return redirect(url_for('admin.movie_list', page=pre_page))
 
 
+# 电影编辑
 @admin.route("/movie/edit/<int:id>/", methods=['GET', 'POST'])
 @admin_login_req
 def movie_edit(id=None):
@@ -317,6 +328,7 @@ def movie_edit(id=None):
     return render_template('admin/movie_edit.html', form=form, movie=movie)
 
 
+# 添加上映预告
 @admin.route("/preview/add/", methods=['GET', 'POST'])
 @admin_login_req
 def preview_add():
@@ -347,6 +359,7 @@ def preview_add():
     return render_template('admin/preview_add.html', form=form)
 
 
+# 上映预告列表
 @admin.route("/preview/list/<int:page>/", methods=['GET'])
 @admin_login_req
 def preview_list(page=None):
@@ -359,6 +372,7 @@ def preview_list(page=None):
     return render_template('admin/preview_list.html', page_data=page_data)
 
 
+# 上映预告删除
 @admin.route("/preview/del/<int:id>/", methods=['GET'])
 @admin_login_req
 def preview_del(id=None):
@@ -371,6 +385,7 @@ def preview_del(id=None):
     return redirect(url_for('admin.preview_list', page=pre_page))
 
 
+# 上映预告编辑
 @admin.route("/preview/edit/<int:id>/", methods=['GET', 'POST'])
 @admin_login_req
 def preview_edit(id=None):
@@ -405,6 +420,7 @@ def preview_edit(id=None):
     return render_template('admin/preview_edit.html', form=form, preview=preview)
 
 
+# 会员列表
 @admin.route("/user/list/<int:page>/", methods=['GET'])
 @admin_login_req
 def user_list(page=None):
@@ -417,6 +433,7 @@ def user_list(page=None):
     return render_template('admin/user_list.html', page_data=page_data)
 
 
+# 查看会员
 @admin.route("/user/view/<int:id>/", methods=['GET'])
 @admin_login_req
 def user_view(id=None):
@@ -430,6 +447,7 @@ def user_view(id=None):
     return render_template('admin/user_view.html', user=user, pre_page=pre_page)
 
 
+# 会员删除
 @admin.route("/user/del/<int:id>/", methods=['GET'])
 @admin_login_req
 def user_del(id=None):
@@ -442,6 +460,7 @@ def user_del(id=None):
     return redirect(url_for('admin.user_list', page=pre_page))
 
 
+# 评论列表
 @admin.route("/comment/list/<int:page>/", methods=['GET'])
 @admin_login_req
 def comment_list(page=None):
@@ -462,6 +481,7 @@ def comment_list(page=None):
     return render_template('admin/comment_list.html', page_data=page_data)
 
 
+# 删除评论
 @admin.route("/comment/del/<int:id>/", methods=['GET'])
 @admin_login_req
 def comment_del(id=None):
@@ -474,6 +494,7 @@ def comment_del(id=None):
     return redirect(url_for('admin.comment_list', page=pre_page))
 
 
+# 电影收藏列表
 @admin.route("/moviecol/list/<int:page>/", methods=['GET'])
 @admin_login_req
 def moviecol_list(page=None):
@@ -493,6 +514,7 @@ def moviecol_list(page=None):
     return render_template('admin/moviecol_list.html', page_data=page_data)
 
 
+# 删除电影收藏
 @admin.route("/moviecol/del/<int:id>/", methods=['GET'])
 @admin_login_req
 def moviecol_del(id=None):
@@ -505,6 +527,7 @@ def moviecol_del(id=None):
     return redirect(url_for('admin.moviecol_list', page=pre_page))
 
 
+# 操作日志管理
 @admin.route("/oplog/list/<int:page>/", methods=['GET'])
 @admin_login_req
 def oplog_list(page=None):
@@ -521,6 +544,7 @@ def oplog_list(page=None):
     return render_template('admin/oplog_list.html', page_data=page_data)
 
 
+# 管理员登录日志列表
 # 不知道为什么这里必须在路径结尾加上/，否则出现404，索性给所有的路径的结尾都加上了/
 @admin.route("/adminloginlog/list/<int:page>/", methods=['GET'])
 @admin_login_req
@@ -538,6 +562,7 @@ def adminloginlog_list(page=None):
     return render_template('admin/adminloginlog_list.html', page_data=page_data)
 
 
+# 会员登录日志列表
 @admin.route("/userloginlog/list/<int:page>/", methods=["GET"])
 @admin_login_req
 def userloginlog_list(page=None):
@@ -554,20 +579,89 @@ def userloginlog_list(page=None):
     return render_template("admin/userloginlog_list.html", page_data=page_data)
 
 
-@admin.route("/auth/add/")
+# 添加权限
+@admin.route("/auth/add/", methods=['GET', 'POST'])
 @admin_login_req
 def auth_add():
     """添加权限"""
-    return render_template("admin/auth_add.html")
+    form = AuthForm()
+    if form.validate_on_submit():
+        data = form.data
+        # 这么做避免在添加已存在的权限地址时发生sqlalchemy.exc.IntegrityError: (_mysql_exceptions.IntegrityError)
+        name_count = Auth.query.filter_by(name=data["name"]).count()
+        # 已存在该权限
+        if name_count == 1:
+            flash("权限名称已经存在，请重新编辑！", "err")
+            return redirect(url_for('admin.auth_add'))
+        url_count = Auth.query.filter_by(url=data["url"]).count()
+        if url_count == 1:
+            flash("权限地址已经存在，请重新编辑！", "err")
+            return redirect(url_for('admin.auth_add'))
+        auth = Auth(
+            name=data['name'],
+            url=data['url']
+        )
+        db.session.add(auth)
+        db.session.commit()
+        flash('添加权限成功！', 'ok')
+        return redirect(url_for('admin.auth_add'))
+    return render_template("admin/auth_add.html", form=form)
 
 
-@admin.route("/auth/list/")
+# 权限列表
+@admin.route("/auth/list/<int:page>/", methods=['GET'])
 @admin_login_req
-def auth_list():
+def auth_list(page=None):
     """权限列表"""
-    return render_template("admin/auth_list.html")
+    if page is None:
+        page = 1
+    page_data = Auth.query.order_by(
+        Auth.addtime.desc()
+    ).paginate(page=page, per_page=PAGE_COUNT)
+    return render_template("admin/auth_list.html", page_data=page_data)
 
 
+# 权限删除
+@admin.route("/auth/del/<int:id>/", methods=['GET'])
+@admin_login_req
+def auth_del(id=None):
+    """权限删除"""
+    pre_page = admin_page(Auth)
+    auth = Auth.query.filter_by(id=id).first_or_404()
+    db.session.delete(auth)
+    db.session.commit()
+    flash("权限【%s】删除成功！" % auth.name, "ok")
+    return redirect(url_for('admin.auth_list', page=pre_page))
+
+
+# 权限编辑
+@admin.route("/auth/edit/<int:id>", methods=['GET', 'POST'])
+@admin_login_req
+def auth_edit(id=None):
+    form = AuthForm()
+    form.submit.label.text = "编辑"
+    auth = Auth.query.get_or_404(int(id))
+    if form.validate_on_submit():
+        data = form.data
+        name_count = Auth.query.filter_by(name=data["name"]).count()
+        if auth.name != data["name"] and name_count == 1:
+            flash("权限名称已经存在，请重新编辑！", "err")
+            return redirect(url_for('admin.auth_edit', id=auth.id))
+        # 这么做避免在添加已存在的权限地址时发生sqlalchemy.exc.IntegrityError: (_mysql_exceptions.IntegrityError)
+        url_count = Auth.query.filter_by(url=data["url"]).count()
+        if auth.url != data["url"] and url_count == 1:
+            flash("权限地址已经存在，请重新编辑！", "err")
+            return redirect(url_for('admin.auth_edit', id=auth.id))
+        auth.name = data['name']
+        auth.url = data['url']
+        db.session.add(auth)
+        db.session.commit()
+        flash("权限【%s】修改成功！" % auth.name, "ok")
+        redirect(url_for('admin.auth_edit', id=auth.id))
+    return render_template('admin/auth_edit.html', form=form, auth=auth)
+
+
+# 添加角色
 @admin.route("/role/add/")
 @admin_login_req
 def role_add():
@@ -575,6 +669,7 @@ def role_add():
     return render_template("admin/role_add.html")
 
 
+# 角色列表
 @admin.route("/role/list/")
 @admin_login_req
 def role_list():
@@ -582,6 +677,7 @@ def role_list():
     return render_template("admin/role_list.html")
 
 
+# 添加管理员
 @admin.route("/admin/add/")
 @admin_login_req
 def admin_add():
@@ -589,6 +685,7 @@ def admin_add():
     return render_template("admin/admin_add.html")
 
 
+# 管理员列表
 @admin.route("/admin/list/")
 @admin_login_req
 def admin_list():
