@@ -57,7 +57,7 @@
                                     <td>
                                         <a href="{{ url_for('admin.preview_edit',id=v.id) }}" class="label label-success">编辑</a>
                                         &nbsp;
-                                        <a href="{{ url_for('admin.preview_del',id=v.id) }}" class="label label-danger">删除</a>
+                                        <a href="{{ url_for('admin.preview_del',id=v.id,pre_page=page_data.page) }}" class="label label-danger">删除</a>
                                     </td>
                                 </tr>
                             {% endfor %}

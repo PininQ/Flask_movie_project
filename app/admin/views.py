@@ -11,6 +11,9 @@ import os
 import uuid
 from datetime import datetime
 
+# 分页个数
+PAGE_COUNT = 5
+
 
 def admin_login_req(f):
     """登录装饰器"""
@@ -29,6 +32,18 @@ def change_filename(filename):
     fileinfo = os.path.splitext(filename)
     filename = datetime.now().strftime("%Y%m%d%H%M%S") + str(uuid.uuid4().hex) + fileinfo[-1]
     return filename
+
+
+def admin_page(model_name):
+    count_1 = model_name.query.count()
+    # 假如删除当前页是最后一页
+    pre_page = int(request.args.get('pre_page')) - 1
+    # 此处考虑全删完了，没法前挪的情况，0被视为false
+    if not pre_page:
+        pre_page = 1
+    elif (count_1 - 1) % PAGE_COUNT != 0 or pre_page + 1 < count_1 / PAGE_COUNT:
+        pre_page = int(request.args.get('pre_page'))
+    return pre_page
 
 
 # 调用蓝图(app/admin/views.py)
@@ -122,7 +137,7 @@ def tag_list(page=None):
         page = 1
     page_data = Tag.query.order_by(
         Tag.addtime.desc()
-    ).paginate(page=page, per_page=5)
+    ).paginate(page=page, per_page=PAGE_COUNT)
     return render_template('admin/tag_list.html', page_data=page_data)
 
 
@@ -130,12 +145,13 @@ def tag_list(page=None):
 @admin_login_req
 def tag_del(id=None):
     """标签删除"""
+    pre_page = admin_page(Tag)
     # filter_by在查不到或多个的时候并不会报错，get会报错。
     tag = Tag.query.filter_by(id=id).first_or_404()
     db.session.delete(tag)
     db.session.commit()
     flash("标签【%s】删除成功！" % tag.name, "ok")
-    return redirect(url_for('admin.tag_list', page=1))
+    return redirect(url_for('admin.tag_list', page=pre_page))
 
 
 @admin.route("/movie/add/", methods=['GET', 'POST'])
@@ -195,7 +211,7 @@ def movie_list(page=None):
         Tag.id == Movie.tag_id
     ).order_by(
         Movie.addtime.desc()
-    ).paginate(page=page, per_page=5)
+    ).paginate(page=page, per_page=PAGE_COUNT)
     return render_template('admin/movie_list.html', page_data=page_data)
 
 
@@ -203,11 +219,12 @@ def movie_list(page=None):
 @admin_login_req
 def movie_del(id=None):
     """电影删除"""
+    pre_page = admin_page(Movie)
     movie = Movie.query.get_or_404(int(id))
     db.session.delete(movie)
     db.session.commit()
     flash("删除电影成功！", "ok")
-    return redirect(url_for('admin.movie_list', page=1))
+    return redirect(url_for('admin.movie_list', page=pre_page))
 
 
 @admin.route("/movie/edit/<int:id>", methods=['GET', 'POST'])
@@ -301,7 +318,7 @@ def preview_list(page=None):
         page = 1
     page_data = Preview.query.order_by(
         Preview.addtime.desc()
-    ).paginate(page=page, per_page=5)
+    ).paginate(page=page, per_page=PAGE_COUNT)
     return render_template('admin/preview_list.html', page_data=page_data)
 
 
@@ -309,11 +326,12 @@ def preview_list(page=None):
 @admin_login_req
 def preview_del(id=None):
     """上映预告删除"""
+    pre_page = admin_page(Preview)
     preview = Preview.query.get_or_404(int(id))
     db.session.delete(preview)
     db.session.commit()
     flash("删除上映预告成功！", 'ok')
-    return redirect(url_for('admin.preview_list', page=1))
+    return redirect(url_for('admin.preview_list', page=pre_page))
 
 
 @admin.route("/preview/edit/<int:id>", methods=['GET', 'POST'])
@@ -358,7 +376,7 @@ def user_list(page=None):
         page = 1
     page_data = User.query.order_by(
         User.addtime.desc()
-    ).paginate(page=page, per_page=5)
+    ).paginate(page=page, per_page=PAGE_COUNT)
     return render_template('admin/user_list.html', page_data=page_data)
 
 
@@ -379,11 +397,7 @@ def user_view(id=None):
 @admin_login_req
 def user_del(id=None):
     """会员删除"""
-    # 假如删除当前页是最后一页
-    pre_page = int(request.args.get('pre_page')) - 1
-    # 此处考虑全删完了，没法前挪的情况，0被视为false
-    if not pre_page:
-        pre_page = 1
+    pre_page = admin_page(User)
     user = User.query.get_or_404(int(id))
     db.session.delete(user)
     db.session.commit()
@@ -407,7 +421,7 @@ def comment_list(page=None):
         User.id == Comment.user_id
     ).order_by(
         Comment.addtime.desc()
-    ).paginate(page=page, per_page=2)
+    ).paginate(page=page, per_page=PAGE_COUNT)
     return render_template('admin/comment_list.html', page_data=page_data)
 
 
@@ -415,15 +429,7 @@ def comment_list(page=None):
 @admin_login_req
 def comment_del(id=None):
     """删除评论"""
-    comment_count = Comment.query.count()
-    # 假如删除当前页是最后一页
-    pre_page = int(request.args.get('pre_page')) - 1
-    # 此处考虑全删完了，没法前挪的情况，0被视为false
-    if not pre_page:
-        pre_page = 1
-    elif (comment_count % 2 - 1) != 0:
-        pre_page = int(request.args.get('pre_page'))
-    # print(comment_count)
+    pre_page = admin_page(Comment)
     comment = Comment.query.get_or_404(int(id))
     db.session.delete(comment)
     db.session.commit()
