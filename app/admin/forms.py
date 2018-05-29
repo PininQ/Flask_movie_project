@@ -3,8 +3,8 @@ __author__ = 'QB'
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, FileField, TextAreaField, SelectField, SelectMultipleField
-from wtforms.validators import DataRequired, ValidationError
-from app.models import Admin, Tag, Auth
+from wtforms.validators import DataRequired, ValidationError, EqualTo
+from app.models import Admin, Tag, Auth, Role
 
 
 class LoginForm(FlaskForm):
@@ -280,6 +280,7 @@ class AuthForm(FlaskForm):
 
 
 class RoleForm(FlaskForm):
+    """角色管理"""
     name = StringField(
         label="角色名称",
         validators=[
@@ -314,4 +315,52 @@ class RoleForm(FlaskForm):
 
 
 class AdminForm(FlaskForm):
-    pass
+    """管理员管理"""
+    name = StringField(
+        label="管理员名称",
+        validators=[
+            DataRequired("管理员名称不能为空！")
+        ],
+        description="管理员名称",
+        render_kw={
+            "class": "form-control",
+            "placeholder": "请输入管理员名称",
+        }
+    )
+    pwd = PasswordField(
+        label="管理员密码",
+        validators=[
+            DataRequired("管理员密码不能为空！")
+        ],
+        description="管理员密码",
+        render_kw={
+            "class": "form-control",
+            "placeholder": "请输入管理员密码",
+        }
+    )
+    repwd = PasswordField(
+        label="管理员确认密码",
+        validators=[
+            DataRequired("管理员确认密码不能为空！"),
+            EqualTo('pwd', message='两次输入密码不一致')
+        ],
+        description="管理员确认密码",
+        render_kw={
+            "class": "form-control",
+            "placeholder": "请输入管理员确认密码",
+        }
+    )
+    role_id = SelectField(
+        label="所属角色",
+        coerce=int,
+        choices=[(v.id, v.name) for v in Role.query.all()],
+        render_kw={
+            "class": "btn btn-primary"
+        }
+    )
+    submit = SubmitField(
+        "添加",
+        render_kw={
+            "class": "btn btn-primary"
+        }
+    )

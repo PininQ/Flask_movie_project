@@ -739,16 +739,42 @@ def role_edit(id=None):
 
 
 # 添加管理员
-@admin.route("/admin/add/")
+@admin.route("/admin/add/", methods=['GET', 'POST'])
 @admin_login_req
 def admin_add():
     """添加管理员"""
-    return render_template("admin/admin_add.html")
+    form = AdminForm()
+    from werkzeug.security import generate_password_hash
+    if form.validate_on_submit():
+        data = form.data
+        name_count = Admin.query.filter_by(name=data["name"]).count()
+        if name_count == 1:
+            flash("管理员名称已经存在，请重新编辑！", "err")
+            return redirect(url_for('admin.admin_add'))
+        admin = Admin(
+            name=data['name'],
+            pwd=generate_password_hash(data['pwd']),
+            role_id=data['role_id'],
+            is_super=1
+        )
+        db.session.add(admin)
+        db.session.commit()
+        flash("添加管理员成功！", "ok")
+    return render_template("admin/admin_add.html", form=form)
 
 
 # 管理员列表
-@admin.route("/admin/list/")
+@admin.route("/admin/list/<int:page>/", methods=['GET'])
 @admin_login_req
-def admin_list():
+def admin_list(page=None):
     """管理员列表"""
-    return render_template("admin/admin_list.html")
+    if page is None:
+        page = 1
+    page_data = Admin.query.join(
+        Role
+    ).filter(
+        Role.id == Admin.role_id
+    ).order_by(
+        Admin.addtime.desc()
+    ).paginate(page=page, per_page=PAGE_COUNT)
+    return render_template("admin/admin_list.html", page_data=page_data)
