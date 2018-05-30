@@ -2,12 +2,15 @@
 __author__ = 'QB'
 from . import home
 from flask import render_template, redirect, url_for, flash, session, request
-from app.home.forms import RegisterForm, LoginForm
+from app.home.forms import RegisterForm, LoginForm, UserdetailForm
 from app.models import User, Userlog
 from werkzeug.security import generate_password_hash
+from werkzeug.utils import secure_filename
 from app import db, app
 from functools import wraps
 import uuid
+import os
+from datetime import datetime
 
 
 # 登录装饰器
@@ -22,10 +25,16 @@ def user_login_req(f):
     return decorated_function
 
 
+# 修改文件名称
+def change_filename(filename):
+    fileinfo = os.path.splitext(filename)
+    filename = datetime.now().strftime("%Y%m%d%H%M%S") + str(uuid.uuid4().hex) + fileinfo[-1]
+    return filename
+
+
 # 登录：调用蓝图(app/home/views.py)
 @home.route('/login/', methods=['GET', 'POST'])
 def login():
-    """登录"""
     form = LoginForm()
     if form.validate_on_submit():
         data = form.data
@@ -55,9 +64,9 @@ def login():
     return render_template('home/login.html', form=form)
 
 
+# 退出
 @home.route('/logout/')
 def logout():
-    """退出"""
     session.pop("user", None)
     session.pop("user_id", None)
     # 重定向到home模块下的登录
@@ -67,7 +76,6 @@ def logout():
 # 会员注册
 @home.route('/register/', methods=['GET', 'POST'])
 def register():
-    """注册"""
     form = RegisterForm()
     if form.validate_on_submit():
         data = form.data
@@ -84,11 +92,54 @@ def register():
     return render_template('home/register.html', form=form)
 
 
-@home.route('/user/')
+# 会员中心个人资料
+@home.route('/user/', methods=['GET', 'POST'])
 @user_login_req
 def user():
-    """会员中心"""
-    return render_template('home/user.html')
+    form = UserdetailForm()
+    user = User.query.get(int(session['user_id']))
+    form.face.validators = []
+    if request.method == 'GET':
+        form.name.data = user.name
+        form.email.data = user.email
+        form.phone.data = user.phone
+        form.info.data = user.info
+    if form.validate_on_submit():
+        data = form.data
+        if not os.path.exists(app.config['FC_DIR']):
+            os.makedirs(app.config['FC_DIR'])
+            os.chmod(app.config['DC_DIR'], 'rw')
+        # 上传头像
+        if form.face.data != '':  # 说明已经重新上传了头像
+            file_face = secure_filename(form.face.data.filename)
+            user.face = change_filename(file_face)
+            form.face.data.save(app.config['FC_DIR'] + user.face)
+
+        # 会员名、邮箱、手机号码有可能重复
+        name_count = User.query.filter_by(name=data['name']).count()
+        if data['name'] != user.name and name_count == 1:
+            flash("会员名已经存在，请重新编辑", "err")
+            return redirect(url_for("home.user"))
+
+        email_count = User.query.filter_by(email=data['email']).count()
+        if data['email'] != user.email and email_count == 1:
+            flash("邮箱已经存在，请重新编辑", "err")
+            return redirect(url_for("home.user"))
+
+        phone_count = User.query.filter_by(phone=data['phone']).count()
+        if data['phone'] != user.phone and phone_count == 1:
+            flash("手机号码已经存在，请重新编辑", "err")
+            return redirect(url_for("home.user"))
+
+        user.name = data['name']
+        user.email = data['email']
+        user.phone = data['phone']
+        user.info = data['info']
+        db.session.add(user)
+        db.session.commit()
+        flash("修改成功！", "ok")
+        return redirect(url_for("home.user"))
+    return render_template('home/user.html', form=form, user=user)
 
 
 @home.route('/pwd/')

@@ -2,7 +2,7 @@
 __author__ = 'QB'
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, FileField, TextAreaField
 from wtforms.validators import DataRequired, Email, Regexp, EqualTo, ValidationError
 from app.models import User
 
@@ -24,7 +24,8 @@ class RegisterForm(FlaskForm):
         label="邮箱",
         validators=[
             DataRequired("邮箱不能为空!"),
-            Email("邮箱格式不正确！")
+            # Email("邮箱格式不正确！"),
+            Regexp("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$", message="邮箱格式不正确！")
         ],
         description="邮箱",
         render_kw={
@@ -36,7 +37,7 @@ class RegisterForm(FlaskForm):
         label="手机号码",
         validators=[
             DataRequired("手机号码不能为空!"),
-            Regexp("(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\\d{8}", message="手机号码格式不正确！")
+            Regexp("^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\\d{8}$", message="手机号码格式不正确！")
         ],
         description="手机号码",
         render_kw={
@@ -120,5 +121,73 @@ class LoginForm(FlaskForm):
         "登录",
         render_kw={
             "class": "btn btn-lg btn-success btn-block"
+        }
+    )
+
+
+class UserdetailForm(FlaskForm):
+    name = StringField(
+        label="会员名",
+        validators=[
+            DataRequired("会员名不能为空!"),
+        ],
+        description="会员名",
+        render_kw={
+            "class": "form-control",
+            "placeholder": "请设置会员名"
+        }
+    )
+    email = StringField(
+        label="邮箱",
+        validators=[
+            DataRequired("邮箱不能为空!"),
+            # Email("邮箱格式不正确！"),
+            Regexp("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$", message="邮箱格式不正确！")
+        ],
+        description="邮箱",
+        render_kw={
+            "class": "form-control",
+            "placeholder": "请输入邮箱"
+        }
+    )
+    phone = StringField(
+        label="手机号码",
+        validators=[
+            DataRequired("手机号码不能为空!"),
+            Regexp("^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\\d{8}$", message="手机号码格式不正确！")
+        ],
+        description="手机号码",
+        render_kw={
+            "class": "form-control",
+            "placeholder": "请输入手机号码"
+        }
+    )
+    face = FileField(
+        label='头像',
+        validators=[
+            DataRequired("请上传头像！"),
+        ],
+        description="头像",
+        render_kw={
+            "style": "margin-bottom:6px;"
+        }
+    )
+    info = TextAreaField(
+        label="简介",
+        # validators=[
+        #     DataRequired("简介不能为空！")
+        # ],
+        description="简介",
+        render_kw={
+            "class": "form-control",
+            "placeholder": "请输入简介",
+            "style": "resize:none;",
+            "rows": 10
+        }
+    )
+    submit = SubmitField(
+        '保存修改',
+        render_kw={
+            "class": "btn btn-success"
         }
     )
