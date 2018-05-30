@@ -191,3 +191,46 @@ class UserdetailForm(FlaskForm):
             "class": "btn btn-success"
         }
     )
+
+
+class PwdForm(FlaskForm):
+    old_pwd = PasswordField(
+        label="旧密码",
+        validators=[
+            DataRequired("旧密码不能为空！")
+        ],
+        description="旧密码",
+        render_kw={
+            "class": "form-control",
+            "placeholder": "旧密码",
+        }
+    )
+    new_pwd = PasswordField(
+        label="新密码",
+        validators=[
+            DataRequired("新密码不能为空！"),
+        ],
+        description="新密码",
+        render_kw={
+            "class": "form-control",
+            "placeholder": "新密码",
+        }
+    )
+    repwd = PasswordField(
+        label="确认密码",
+        validators=[
+            DataRequired("确认密码不能为空！"),
+            EqualTo('new_pwd', message='两次输入密码不一致')
+        ],
+        description="确认密码",
+        render_kw={
+            "class": "form-control",
+            "placeholder": "确认密码",
+        }
+    )
+    submit = SubmitField(
+        "修改密码",
+        render_kw={
+            "class": "btn btn-success"
+        }
+    )

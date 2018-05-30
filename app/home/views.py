@@ -2,7 +2,7 @@
 __author__ = 'QB'
 from . import home
 from flask import render_template, redirect, url_for, flash, session, request
-from app.home.forms import RegisterForm, LoginForm, UserdetailForm
+from app.home.forms import RegisterForm, LoginForm, UserdetailForm, PwdForm
 from app.models import User, Userlog
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
@@ -142,11 +142,23 @@ def user():
     return render_template('home/user.html', form=form, user=user)
 
 
-@home.route('/pwd/')
+# 修改密码
+@home.route('/pwd/', methods=['GET', 'POST'])
 @user_login_req
 def pwd():
-    """修改密码"""
-    return render_template('home/pwd.html')
+    form = PwdForm()
+    if form.validate_on_submit():
+        data = form.data
+        user = User.query.filter_by(name=session['user']).first()
+        if not user.check_pwd(data['old_pwd']):
+            flash("旧密码不正确！", "err")
+            return redirect(url_for("home.pwd"))
+        user.pwd = generate_password_hash(data["new_pwd"])
+        db.session.add(user)
+        db.session.commit()
+        flash("修改密码成功，请重新登录！", "ok")
+        return redirect(url_for("home.logout"))
+    return render_template('home/pwd.html', form=form)
 
 
 @home.route('/comments/')
@@ -156,11 +168,18 @@ def comments():
     return render_template('home/comments.html')
 
 
-@home.route('/loginlog/')
+# 登录日志
+@home.route('/loginlog/<int:page>/', methods=['GET'])
 @user_login_req
-def loginlog():
-    """登录日志"""
-    return render_template('home/loginlog.html')
+def loginlog(page=None):
+    if page is None:
+        page = 1
+    page_data = Userlog.query.filter_by(
+        user_id=int(session["user_id"])
+    ).order_by(
+        Userlog.addtime.desc()
+    ).paginate(page=page, per_page=5)
+    return render_template('home/loginlog.html',page_data=page_data)
 
 
 @home.route('/moviecol/')
