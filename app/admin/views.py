@@ -304,6 +304,11 @@ def movie_del(id=None):
     """电影删除"""
     pre_page = admin_page(Movie)
     movie = Movie.query.get_or_404(int(id))
+    # 删除本地的视频和封面
+    if os.path.exists(app.config['UP_DIR'] + movie.url):
+        os.remove(app.config['UP_DIR'] + movie.url)
+    if os.path.exists(app.config['UP_DIR'] + movie.logo):
+        os.remove(app.config['UP_DIR'] + movie.logo)
     db.session.delete(movie)
     db.session.commit()
     flash("删除电影成功！", "ok")
@@ -419,6 +424,10 @@ def preview_del(id=None):
     """上映预告删除"""
     pre_page = admin_page(Preview)
     preview = Preview.query.get_or_404(int(id))
+    if os.path.exists(app.config['UP_DIR'] + preview.logo):
+        # 删除文件，可使用以下两种方法。
+        os.remove(app.config['UP_DIR'] + preview.logo)
+        # os.unlink(my_file)
     db.session.delete(preview)
     db.session.commit()
     flash("删除上映预告成功！", 'ok')
