@@ -12,7 +12,7 @@ import uuid
 from datetime import datetime
 
 # 分页个数
-PAGE_COUNT = 3
+PAGE_COUNT = 5
 
 
 # 上下应用处理器
@@ -55,7 +55,7 @@ def admin_auth(f):
         ).first()
         # 通过role获取权限字符串
         auths = admin.role.auths
-        print("字符串：%s" % auths)
+        # print("字符串：%s" % auths)
         if auths != '':
             # 将存储形式为字符串的权限转换为整型列表
             auths = list(map(lambda v: int(v), auths.split(",")))
@@ -64,8 +64,8 @@ def admin_auth(f):
             urls = [v.url for v in auth_list for val in auths if v.id == val]
             # 当前访问的路由规则
             rule = request.url_rule
-            print(urls)
-            print(rule)
+            # print(urls)
+            # print(rule)
             # 判断当前请求的路由规则是否存在于urls，否则返回一个404的错误信息
             if str(rule) not in urls:
                 abort(404)
@@ -86,11 +86,11 @@ def admin_page(model_name):
     return pre_page
 
 
-# 首页系统管理：调用蓝图(app/admin/views.py)
+# 首页：调用蓝图(app/admin/views.py)
 @admin.route("/")
 @admin_login_req
 def index():
-    """首页系统管理"""
+    """首页"""
     return render_template('admin/index.html')
 
 
@@ -104,7 +104,7 @@ def login():
         admin = Admin.query.filter_by(name=data['account']).first()
         # 密码错误时，check_pwd返回False,否则返回True
         if not admin.check_pwd(data['pwd']):
-            flash("密码错误！", 'err')
+            flash("密码不正确！", 'err')
             return redirect(url_for('admin.login'))
         # 定义session保存会话
         session['admin'] = data['account']
@@ -159,7 +159,7 @@ def tag_add():
         tag_count = Tag.query.filter_by(name=data["name"]).count()
         # 已存在该标签
         if tag_count == 1:
-            flash("标签已经存在！", "err")
+            flash("标签已经存在，请重新编辑！", "err")
             return redirect(url_for('admin.tag_add'))
         tag = Tag(
             name=data['name']
@@ -192,7 +192,7 @@ def tag_edit(id=None):
         data = form.data
         tag_count = Tag.query.filter_by(name=data["name"]).count()
         if tag.name != data["name"] and tag_count == 1:
-            flash("标签已经存在！", "err")
+            flash("标签已经存在，请重新编辑！", "err")
             return redirect(url_for('admin.tag_edit', id=tag.id))
         tag.name = data['name']
         db.session.add(tag)
@@ -255,7 +255,7 @@ def movie_add():
         movie_count = Movie.query.filter_by(title=data["title"]).count()
         # 已存在该上映预告
         if movie_count == 1:
-            flash("电影名称已经存在！", "err")
+            flash("片名已经存在，请重新编辑！", "err")
             return redirect(url_for('admin.movie_add'))
         movie = Movie(
             title=data['title'],
@@ -331,7 +331,7 @@ def movie_edit(id=None):
         movie_count = Movie.query.filter_by(title=data['title']).count()
         # 片名已经存在，不必重复进行编辑
         if movie_count == 1 and movie.title != data['title']:
-            flash("片名已经存在！", "err")
+            flash("片名已经存在，请重新编辑！", "err")
             return redirect(url_for('admin.movie_edit', id=id))
 
         # 如果目录不存在，再创建一个多级目录
@@ -384,7 +384,7 @@ def preview_add():
 
         preview_count = Preview.query.filter_by(title=data["title"]).count()
         if preview_count == 1:
-            flash("上映预告已经存在！", "err")
+            flash("上映预告已经存在，请重新编辑！", "err")
             return redirect(url_for('admin.preview_add'))
         preview = Preview(
             title=data['title'],
@@ -442,7 +442,7 @@ def preview_edit(id=None):
         data = form.data
         preview_count = Preview.query.filter_by(title=data["title"]).count()
         if preview.title != data["title"] and preview_count == 1:
-            flash("预告名称已经存在！", "err")
+            flash("预告名称已经存在，请重新编辑！", "err")
             return redirect(url_for('admin.preview_edit', id=preview.id))
 
         if not os.path.exists(app.config['UP_DIR']):
