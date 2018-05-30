@@ -3,7 +3,7 @@ __author__ = 'QB'
 from . import home
 from flask import render_template, redirect, url_for, flash, session, request
 from app.home.forms import RegisterForm, LoginForm, UserdetailForm, PwdForm
-from app.models import User, Userlog
+from app.models import User, Userlog, Preview
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 from app import db, app
@@ -111,6 +111,9 @@ def user():
             os.chmod(app.config['DC_DIR'], 'rw')
         # 上传头像
         if form.face.data != '':  # 说明已经重新上传了头像
+            # 如果有头像，删除本地的头像。保存新的头像在本地
+            if os.path.exists(app.config['UP_DIR'] + user.face):
+                os.remove(app.config['UP_DIR'] + user.face)
             file_face = secure_filename(form.face.data.filename)
             user.face = change_filename(file_face)
             form.face.data.save(app.config['FC_DIR'] + user.face)
@@ -161,10 +164,10 @@ def pwd():
     return render_template('home/pwd.html', form=form)
 
 
+# 评论记录
 @home.route('/comments/')
 @user_login_req
 def comments():
-    """评论记录"""
     return render_template('home/comments.html')
 
 
@@ -179,35 +182,36 @@ def loginlog(page=None):
     ).order_by(
         Userlog.addtime.desc()
     ).paginate(page=page, per_page=5)
-    return render_template('home/loginlog.html',page_data=page_data)
+    return render_template('home/loginlog.html', page_data=page_data)
 
 
+# 收藏电影
 @home.route('/moviecol/')
 @user_login_req
 def moviecol():
-    """收藏电影"""
     return render_template('home/moviecol.html')
 
 
+# 首页电影列表
 @home.route('/')
 def index():
-    """首页电影列表"""
     return render_template('home/index.html')
 
 
+# 首页轮播动画
 @home.route('/animation/')
 def animation():
-    """首页轮播动画"""
-    return render_template('home/animation.html')
+    data = Preview.query.all()
+    return render_template('home/animation.html', data=data)
 
 
+# 电影搜索
 @home.route('/search/')
 def search():
-    """电影搜索"""
     return render_template('home/search.html')
 
 
+# 电影详情
 @home.route('/play/')
 def play():
-    """电影详情"""
     return render_template('home/play.html')
