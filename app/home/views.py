@@ -12,6 +12,8 @@ import uuid
 import os
 from datetime import datetime
 
+# 分页个数
+PAGE_COUNT = 10
 
 # 登录装饰器
 def user_login_req(f):
@@ -181,7 +183,7 @@ def loginlog(page=None):
         user_id=int(session["user_id"])
     ).order_by(
         Userlog.addtime.desc()
-    ).paginate(page=page, per_page=5)
+    ).paginate(page=page, per_page=PAGE_COUNT)
     return render_template('home/loginlog.html', page_data=page_data)
 
 
@@ -240,7 +242,7 @@ def index(page=None):
             )
     if page is None:
         page = 1
-    page_data = page_data.paginate(page=page, per_page=10)
+    page_data = page_data.paginate(page=page, per_page=PAGE_COUNT)
     p = dict(
         tid=tid,
         star=star,
@@ -259,9 +261,21 @@ def animation():
 
 
 # 电影搜索
-@home.route('/search/')
-def search():
-    return render_template('home/search.html')
+@home.route('/search/<int:page>/')
+def search(page=None):
+    if page is None:
+        page = 1
+    key = request.args.get("key", "")
+    movie_count = Movie.query.filter(
+        Movie.title.ilike('%' + key + '%')
+    ).count()
+    page_data = Movie.query.filter(
+        Movie.title.ilike('%' + key + '%')
+    ).order_by(
+        Movie.addtime.desc()
+    ).paginate(page=page, per_page=PAGE_COUNT)
+    page_data.key = key
+    return render_template('home/search.html', movie_count=movie_count, key=key, page_data=page_data)
 
 
 # 电影详情
