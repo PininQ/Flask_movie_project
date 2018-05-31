@@ -20,13 +20,16 @@
         {% for v in page_data.items %}
         <div class="media">
             <div class="media-left">
-                <a href="{{ url_for('home.play') }}">
+                <a href="{{ url_for('home.play',id=v.id,page=1) }}">
                     <img class="media-object" style="width: 131px;height: 83px;" src="{{ url_for('static',filename='uploads/'+v.logo) }}" alt="{{ v.title }}">
                 </a>
             </div>
             <div class="media-body">
-                <h4 class="media-heading">{{ v.title }}<a href="{{ url_for('home.play') }}" class="label label-primary pull-right">
-                    <span class="glyphicon glyphicon-play"></span>播放影片</a></h4>
+                <h4 class="media-heading">
+                    <a href="{{ url_for('home.play',id=v.id,page=1) }}" style="color: #000000;text-decoration:none; ">{{ v.title }}</a>
+                    <a href="{{ url_for('home.play',id=v.id,page=1) }}" class="label label-primary pull-right">
+                    <span class="glyphicon glyphicon-play"></span>播放影片</a>
+                </h4>
                 {{ v.info }}
             </div>
         </div>

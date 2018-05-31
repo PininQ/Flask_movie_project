@@ -111,8 +111,21 @@
         });
         $("#do_search").click(function () {
             var key = $("#key_movie").val();
-            location.href = "{{ url_for("home.search",page=1) }}?key=" + key
-        })
+            location.href = "{{ url_for("home.search",page=1) }}?key=" + key;
+        });
+    });
+    // onclick事件
+    function search(){
+        var key = $("#key_movie").val();
+        location.href = "{{ url_for("home.search",page=1) }}?key=" + key;
+    };
+    $('#key_movie').bind('keypress', function (event) {
+        if (event.keyCode == "13") {
+{#                alert('ssss1');#}
+{#                var key = $("#key_movie").val();#}
+{#                this.location.href = "{{ url_for("home.search",page=1) }}?key=" + key;#}
+{#                alert('ssss2'+key);#}
+        }
     });
 </script>
 {% block js %}
