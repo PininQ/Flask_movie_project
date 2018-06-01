@@ -7,6 +7,8 @@ from app.models import Admin, Tag, Movie, Preview, User, Comment, Moviecol, Oplo
 from functools import wraps
 from app import db, app
 from werkzeug.utils import secure_filename
+import urllib
+import json
 import os
 import uuid
 from datetime import datetime
@@ -86,6 +88,22 @@ def admin_page(model_name):
     return pre_page
 
 
+# 根据API查询IP的地理位置
+def admin_address():
+    ipaddr = json.load(urllib.request.urlopen('http://httpbin.org/ip'))['origin']
+    # 组成查询ip地理位置的网址
+    url = 'http://ip.taobao.com/service/getIpInfo.php?ip=%s' % (ipaddr)
+    # 访问url地址, urlobject是<type 'instance'>对象；
+    urlobject = urllib.request.urlopen(url)
+    urlcontent = urlobject.read()
+    res = json.loads(urlcontent)
+    # print(res)
+    # 显示查询结果
+    ip = res['data']['ip']
+    address = res['data']['country'] + res['data']['region'] + res['data']['city'] + " " + res['data']['isp']
+    return ip, address
+
+
 # 首页：调用蓝图(app/admin/views.py)
 @admin.route("/")
 @admin_login_req
@@ -109,9 +127,12 @@ def login():
         # 定义session保存会话
         session['admin'] = data['account']
         session["admin_id"] = admin.id
+        ip, address = admin_address()
         adminlog = Adminlog(
             admin_id=admin.id,
-            ip=request.remote_addr
+            # ip=request.remote_addr
+            ip=ip,
+            address=address,
         )
         db.session.add(adminlog)
         db.session.commit()
@@ -166,10 +187,13 @@ def tag_add():
         )
         db.session.add(tag)
         db.session.commit()
+        ip, address = admin_address()
         oplog = Oplog(
             admin_id=session['admin_id'],
             # 获取ip地址
-            ip=request.remote_addr,
+            # ip=request.remote_addr,
+            ip=ip,
+            address=address,
             reason='添加一个标签《%s》' % data['name']
         )
         db.session.add(oplog)

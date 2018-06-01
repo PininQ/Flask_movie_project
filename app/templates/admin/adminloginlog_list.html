@@ -36,6 +36,7 @@
                                 <th>管理员</th>
                                 <th>登录时间</th>
                                 <th>登录IP</th>
+                                <th>登录地址</th>
                             </tr>
                             {% for v in page_data.items %}
                             <tr>
@@ -43,6 +44,11 @@
                                 <td>{{ v.admin.name }}</td>
                                 <td>{{ v.addtime }}</td>
                                 <td>{{ v.ip }}</td>
+                                {% if v.address %}
+                                    <td>{{ v.address }}</td>
+                                {% else %}
+                                    <td>未知</td>
+                                {% endif %}
                             </tr>
                             {% endfor %}
                             </tbody>

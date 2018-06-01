@@ -8,6 +8,8 @@ from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 from app import db, app
 from functools import wraps
+import urllib
+import json
 import uuid
 import os
 from datetime import datetime
@@ -35,6 +37,22 @@ def change_filename(filename):
     return filename
 
 
+# 根据API查询IP的地理位置
+def admin_address():
+    ipaddr = json.load(urllib.request.urlopen('http://httpbin.org/ip'))['origin']
+    # 组成查询ip地理位置的网址
+    url = 'http://ip.taobao.com/service/getIpInfo.php?ip=%s' % (ipaddr)
+    # 访问url地址, urlobject是<type 'instance'>对象；
+    urlobject = urllib.request.urlopen(url)
+    urlcontent = urlobject.read()
+    res = json.loads(urlcontent)
+    # print(res)
+    # 显示查询结果
+    ip = res['data']['ip']
+    address = res['data']['country'] + res['data']['region'] + res['data']['city'] + " " + res['data']['isp']
+    return ip, address
+
+
 # 登录：调用蓝图(app/home/views.py)
 @home.route('/login/', methods=['GET', 'POST'])
 def login():
@@ -55,9 +73,12 @@ def login():
                     return redirect(url_for("home.login"))
                 session["user"] = user.name
                 session["user_id"] = user.id
+                ip, address = admin_address()
                 userlog = Userlog(
                     user_id=user.id,
-                    ip=request.remote_addr
+                    # ip=request.remote_addr
+                    ip=ip,
+                    address=address,
                 )
                 db.session.add(userlog)
                 db.session.commit()

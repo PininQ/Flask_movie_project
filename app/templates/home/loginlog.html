@@ -34,10 +34,10 @@
                         <td>{{ v.id }}</td>
                         <td>{{ v.addtime }}</td>
                         <td>{{ v.ip }}</td>
-                        {% if v.ip == "127.0.0.1" %}
-                            <td>未知</td>
+                        {% if v.address %}
+                            <td>{{ v.address }}</td>
                         {% else %}
-                            <td>...</td>
+                            <td>未知</td>
                         {% endif %}
 
                     </tr>

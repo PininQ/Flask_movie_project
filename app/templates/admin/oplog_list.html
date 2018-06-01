@@ -49,6 +49,7 @@
                                 <th>操作时间</th>
                                 <th>操作原因</th>
                                 <th>操作IP</th>
+                                <th>IP地址</th>
                             </tr>
                             {% for v in page_data.items %}
                                 <tr>
@@ -57,6 +58,11 @@
                                     <td>{{ v.addtime }}</td>
                                     <td>{{ v.reason }}</td>
                                     <td>{{ v.ip }}</td>
+                                    {% if v.address %}
+                                        <td>{{ v.address }}</td>
+                                    {% else %}
+                                        <td>未知</td>
+                                    {% endif %}
                                 </tr>
                             {% endfor %}
                             </tbody>

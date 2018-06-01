@@ -38,6 +38,7 @@ class Userlog(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # 所属会员
     ip = db.Column(db.String(100))  # ip地址
     addtime = db.Column(db.DateTime, index=True, default=datetime.now)  # 登录时间
+    address = db.Column(db.String(100))  # 地址
 
     def __repr__(self):
         return '<Userlog %r>' % self.id
@@ -171,6 +172,7 @@ class Adminlog(db.Model):
     admin_id = db.Column(db.Integer, db.ForeignKey('admin.id'))  # 所属管理员
     ip = db.Column(db.String(100))  # 登录IP
     addtime = db.Column(db.DateTime, index=True, default=datetime.now)  # 登录时间
+    address = db.Column(db.String(100))  # 地址
 
     def __repr__(self):
         return '<Adminlog %r>' % self.id
@@ -184,6 +186,7 @@ class Oplog(db.Model):
     ip = db.Column(db.String(100))  # 操作IP
     reason = db.Column(db.String(600))  # 操作原因
     addtime = db.Column(db.DateTime, index=True, default=datetime.now)  # 登录时间
+    address = db.Column(db.String(100))  # 地址
 
     def __repr__(self):
         return '<Oplog %r>' % self.id
