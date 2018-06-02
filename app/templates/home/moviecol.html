@@ -52,7 +52,11 @@
                 {% endfor %}
             </div>
             <div class="col-md-12 text-center" style="margin-top:6px;">
-                {{ pg.page(page_data,'home.moviecol') }}
+                {% if moviecol_count %}
+                    {{ pg.page(page_data,'home.moviecol') }}
+                {% else %}
+                    <p>空空如也，快去收藏电影吧！</p>
+                {% endif %}
             </div>
         </div>
     </div>

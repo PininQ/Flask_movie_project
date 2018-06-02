@@ -108,7 +108,7 @@
             </div>
         </div>
          <div class="col-md-12" style="margin-top:6px;">
-            <div class="panel panel-info">
+            <div class="panel panel-danger">
                 <div class="panel-heading">
                     <h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span>&nbsp;电影评论</h3>
                 </div>
@@ -128,11 +128,15 @@
                     {% if "user" in session %}
                         {% for msg in get_flashed_messages(category_filter=["ok"]) %}
                             <div class="alert alert-success alert-dismissible">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×
+                                    </button>
                                 <h4><i class="icon fa fa-check"></i>{{ msg }}</h4>
                             </div>
                         {% endfor %}
                         {% for msg in get_flashed_messages(category_filter=["err"]) %}
                             <div class="alert alert-danger alert-dismissible">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×
+                                    </button>
                                 <h4><i class="icon fa fa-ban"></i>{{ msg }}</h4>
                             </div>
                         {% endfor %}

@@ -39,7 +39,7 @@
                             <header class="comment-header">
                                 <div class="comment-meta">
                                     <a class="comment-author" href="user.html">{{ v.user.name }}</a>
-                                    评论于
+                                    评论<a style="text-decoration:none;">《{{ v.movie.title }}》</a>于
                                     <time title="{{ v.addtime }}" datetime="{{ v.addtime }}">{{ v.addtime }}</time>
                                 </div>
                             </header>
@@ -50,8 +50,12 @@
                     </li>
                 {% endfor %}
             </ul>
-                <div class="col-md-12 text-center">
-                    {{ pg.page(page_data,'home.comments') }}
+                <div class="col-md-12 text-center" style="margin-top:6px;">
+                    {% if comment_count %}
+                        {{ pg.page(page_data,'home.comments') }}
+                    {% else %}
+                        <p>空空如也，快去评论电影吧！</p>
+                    {% endif %}
                 </div>
         </div>
     </div>

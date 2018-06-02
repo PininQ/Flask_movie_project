@@ -15,7 +15,7 @@ import os
 from datetime import datetime
 
 # 分页个数
-PAGE_COUNT = 1
+PAGE_COUNT = 10
 
 
 # 登录装饰器
@@ -195,6 +195,12 @@ def pwd():
 def comments(page=None):
     if page is None:
         page = 1
+    # 电影评论个数
+    comment_count = Comment.query.join(
+        User
+    ).filter(
+        User.id == session['user_id']
+    ).count()
     page_data = Comment.query.join(
         Movie
     ).join(
@@ -205,7 +211,7 @@ def comments(page=None):
     ).order_by(
         Comment.addtime.desc()
     ).paginate(page=page, per_page=PAGE_COUNT)
-    return render_template('home/comments.html', page_data=page_data)
+    return render_template('home/comments.html', comment_count=comment_count, page_data=page_data)
 
 
 # 登录日志
@@ -253,6 +259,12 @@ def moviecol_add():
 def moviecol(page=None):
     if page is None:
         page = 1
+    # 电影收藏个数
+    moviecol_count = Moviecol.query.join(
+        User
+    ).filter(
+        User.id == session['user_id']
+    ).count()
     page_data = Moviecol.query.join(
         Movie
     ).join(
@@ -263,12 +275,14 @@ def moviecol(page=None):
     ).order_by(
         Moviecol.addtime.desc()
     ).paginate(page=page, per_page=PAGE_COUNT)
-    return render_template('home/moviecol.html', page_data=page_data)
+    return render_template('home/moviecol.html', moviecol_count=moviecol_count, page_data=page_data)
 
 
 # 首页电影列表
 @home.route('/<int:page>/', methods=['GET'])
 def index(page=None):
+    # 电影个数
+    movie_count = Movie.query.count()
     tags = Tag.query.all()
     page_data = Movie.query
     # 标签
@@ -322,7 +336,7 @@ def index(page=None):
         pm=pm,
         cm=cm,
     )
-    return render_template('home/index.html', tags=tags, p=p, page_data=page_data)
+    return render_template('home/index.html', movie_count=movie_count, tags=tags, p=p, page_data=page_data)
 
 
 # 首页上映预告：轮播动画
@@ -338,6 +352,7 @@ def search(page=None):
     if page is None:
         page = 1
     key = request.args.get("key", "")
+    # 相关电影个数
     movie_count = Movie.query.filter(
         Movie.title.ilike('%' + key + '%')
     ).count()
@@ -357,6 +372,7 @@ def play(id=None, page=None):
         Tag.id == Movie.tag_id,
         Movie.id == int(id)
     ).first_or_404()
+
     if page is None:
         page = 1
     page_data = Comment.query.join(

@@ -51,8 +51,8 @@
                                             {{ v.addtime }}
                                         </span>
                                     </span>
-                                关于电影<a>《{{ v.movie.title }}》</a>的评论：{{ v.content }}
-                                <br><a href="{{ url_for('admin.comment_del',id=v.id,pre_page=page_data.page) }}" class="label label-danger pull-right">删除</a>
+                                关于电影<a>《{{ v.movie.title }}》</a>的评论：{{ v.content | safe }}
+                               <a href="{{ url_for('admin.comment_del',id=v.id,pre_page=page_data.page) }}" class="label label-danger pull-right" style="font-size: 12px">删除</a>
                             </div>
                         </div>
                         {% endfor %}

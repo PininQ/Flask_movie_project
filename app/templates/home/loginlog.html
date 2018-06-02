@@ -22,16 +22,16 @@
                 <h3 class="panel-title"><span class="glyphicon glyphicon-map-marker"></span>&nbsp;登录日志</h3>
             </div>
             <div class="panel-body">
-                <table class="table table-bordered">
+                <table class="table table-bordered" style="text-align:center;">
                     <tr>
-                        <td style="width:10%">编号</td>
-                        <td style="width:30%">登录时间</td>
+{#                        <td style="width:10%">编号</td>#}
+                        <td style="width:30%;">登录时间</td>
                         <td style="width:30%">登录IP</td>
                         <td style="width:30%">登录地址</td>
                     </tr>
                     {% for v in page_data.items %}
                     <tr>
-                        <td>{{ v.id }}</td>
+{#                        <td>{{ v.id }}</td>#}
                         <td>{{ v.addtime }}</td>
                         <td>{{ v.ip }}</td>
                         {% if v.address %}
@@ -44,7 +44,9 @@
                     {% endfor %}
                 </table>
                 <div class="col-md-12 text-center" style="margin-top:6px;">
-                    {{ pg.page(page_data,'home.loginlog') }}
+                    {% if page_data %}
+                        {{ pg.page(page_data,'home.loginlog') }}
+                    {% endif %}
                 </div>
             </div>
         </div>

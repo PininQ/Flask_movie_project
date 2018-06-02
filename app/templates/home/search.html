@@ -12,8 +12,14 @@
 <!--内容-->
  <div class="row">
     <div class="col-md-12">
-        <ol class="breadcrumb" style="margin-top:6px;">
-            <li>与"{{ key }}"有关的电影，共{{ movie_count }}部</li>
+         <ol class="breadcrumb" style="margin-top:6px;">
+            {% if movie_count == 0 %}
+                <li>没有找到任何资源</li>
+            {% elif key %}
+                <li>与"{{ key }}"有关的电影，共{{ movie_count }}部</li>
+            {% else %}
+                 <li>共{{ movie_count }}部电影</li>
+            {% endif %}
         </ol>
     </div>
     <div class="col-md-12">
@@ -36,7 +42,9 @@
         {% endfor %}
     </div>
     <div class="col-md-12 text-center">
-        {{ pg.page(page_data,'home.search') }}
+        {% if movie_count %}
+            {{ pg.page(page_data,'home.search') }}
+        {% endif %}
     </div>
 </div>
 <!--内容-->
