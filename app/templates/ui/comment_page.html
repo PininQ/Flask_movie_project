@@ -26,7 +26,11 @@
                     <li class="disabled"><a href="#">下一页</a></li>
                 {% endif %}
 
-                <li><a href="{{ url_for(url,page=data.pages,id=id) }}">尾页</a></li>
+                {% if data.pages == 0 %}
+                    <li><a href="{{ url_for(url,page=1,id=id) }}">尾页</a></li>
+                {% else %}
+                    <li><a href="{{ url_for(url,page=data.pages,id=id) }}">尾页</a></li>
+                {% endif %}
             </ul>
         </nav>
     {% endif %}
