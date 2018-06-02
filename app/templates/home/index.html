@@ -90,13 +90,18 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <a href="{{ url_for('home.play',id=v.id,page=1) }}" class="btn btn-primary" target="_blank" role="button"><span class="glyphicon glyphicon-play"></span>&nbsp;播放</a>
+                    <a href="{{ url_for('home.play',id=v.id,page=1) }}" class="btn btn-primary" target="_blank"
+                       role="button"><span class="glyphicon glyphicon-play"></span>&nbsp;播放</a>
                 </div>
             </div>
             {% endfor %}
 
             <div class="col-md-12">
-                {{ pg.page(page_data,'home.index') }}
+                {% if movie_count %}
+                    {{ pg.page(page_data,'home.index') }}
+                {% else %}
+                    <p>空空如也，快去联系管理员上传电影吧！</p>
+                {% endif %}
             </div>
         </div>
     </div>

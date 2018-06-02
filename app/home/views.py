@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 __author__ = 'QB'
 from . import home
-from flask import render_template, redirect, url_for, flash, session, request
+from flask import render_template, redirect, url_for, flash, session, request, Response
 from app.home.forms import RegisterForm, LoginForm, UserdetailForm, PwdForm, CommentForm
 from app.models import User, Userlog, Preview, Tag, Movie, Comment, Moviecol
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
-from app import db, app
+from app import db, app, rd
 from functools import wraps
 import urllib
 import json
@@ -135,9 +135,10 @@ def user():
             os.chmod(app.config['DC_DIR'], 'rw')
         # 上传头像
         if form.face.data != '':  # 说明已经重新上传了头像
-            # 如果有头像，删除本地的头像。保存新的头像在本地
-            if os.path.exists(app.config['UP_DIR'] + user.face):
-                os.remove(app.config['UP_DIR'] + user.face)
+            if user.face is not None:
+                # 如果有头像，删除本地的头像。保存新的头像在本地
+                if os.path.exists(app.config['UP_DIR'] + user.face):
+                    os.remove(app.config['UP_DIR'] + user.face)
             file_face = secure_filename(form.face.data.filename)
             user.face = change_filename(file_face)
             form.face.data.save(app.config['FC_DIR'] + user.face)
@@ -194,6 +195,12 @@ def pwd():
 def comments(page=None):
     if page is None:
         page = 1
+    # 电影评论个数
+    comment_count = Comment.query.join(
+        User
+    ).filter(
+        User.id == session['user_id']
+    ).count()
     page_data = Comment.query.join(
         Movie
     ).join(
@@ -204,7 +211,7 @@ def comments(page=None):
     ).order_by(
         Comment.addtime.desc()
     ).paginate(page=page, per_page=PAGE_COUNT)
-    return render_template('home/comments.html', page_data=page_data)
+    return render_template('home/comments.html', comment_count=comment_count, page_data=page_data)
 
 
 # 登录日志
@@ -243,7 +250,6 @@ def moviecol_add():
         db.session.add(moviecol)
         db.session.commit()
         data = dict(ok=1)
-    import json
     return json.dumps(data)
 
 
@@ -253,6 +259,12 @@ def moviecol_add():
 def moviecol(page=None):
     if page is None:
         page = 1
+    # 电影收藏个数
+    moviecol_count = Moviecol.query.join(
+        User
+    ).filter(
+        User.id == session['user_id']
+    ).count()
     page_data = Moviecol.query.join(
         Movie
     ).join(
@@ -263,12 +275,14 @@ def moviecol(page=None):
     ).order_by(
         Moviecol.addtime.desc()
     ).paginate(page=page, per_page=PAGE_COUNT)
-    return render_template('home/moviecol.html', page_data=page_data)
+    return render_template('home/moviecol.html', moviecol_count=moviecol_count, page_data=page_data)
 
 
 # 首页电影列表
 @home.route('/<int:page>/', methods=['GET'])
 def index(page=None):
+    # 电影个数
+    movie_count = Movie.query.count()
     tags = Tag.query.all()
     page_data = Movie.query
     # 标签
@@ -322,7 +336,7 @@ def index(page=None):
         pm=pm,
         cm=cm,
     )
-    return render_template('home/index.html', tags=tags, p=p, page_data=page_data)
+    return render_template('home/index.html', movie_count=movie_count, tags=tags, p=p, page_data=page_data)
 
 
 # 首页上映预告：轮播动画
@@ -338,6 +352,7 @@ def search(page=None):
     if page is None:
         page = 1
     key = request.args.get("key", "")
+    # 相关电影个数
     movie_count = Movie.query.filter(
         Movie.title.ilike('%' + key + '%')
     ).count()
@@ -357,6 +372,7 @@ def play(id=None, page=None):
         Tag.id == Movie.tag_id,
         Movie.id == int(id)
     ).first_or_404()
+
     if page is None:
         page = 1
     page_data = Comment.query.join(
@@ -390,3 +406,92 @@ def play(id=None, page=None):
     db.session.add(movie)
     db.session.commit()
     return render_template('home/play.html', movie=movie, form=form, page_data=page_data)
+
+
+# 弹幕播放器
+@home.route("/video/<int:id>/<int:page>/", methods=["GET", "POST"])
+def video(id=None, page=None):
+    movie = Movie.query.join(Tag).filter(
+        Tag.id == Movie.tag_id,
+        Movie.id == int(id)
+    ).first_or_404()
+
+    if page is None:
+        page = 1
+    page_data = Comment.query.join(
+        Movie
+    ).join(
+        User
+    ).filter(
+        Movie.id == movie.id,
+        User.id == Comment.user_id
+    ).order_by(
+        Comment.addtime.desc()
+    ).paginate(page=page, per_page=PAGE_COUNT)
+
+    form = CommentForm()
+    # 判断是否已经登录
+    if "user" in session and form.validate_on_submit():
+        data = form.data
+        comment = Comment(
+            content=data['content'],
+            movie_id=movie.id,
+            user_id=session['user_id'],
+        )
+        db.session.add(comment)
+        db.session.commit()
+        movie.commentnum = movie.commentnum + 1
+        db.session.add(movie)
+        db.session.commit()
+        flash("添加评论成功！", "ok")
+        return redirect(url_for("home.video", id=movie.id, page=1))
+    movie.playnum = movie.playnum + 1
+    db.session.add(movie)
+    db.session.commit()
+    return render_template("home/video.html", movie=movie, form=form, page_data=page_data)
+
+
+# 弹幕消息处理
+@home.route("/tm/", methods=["GET", "POST"])
+def tm():
+    if request.method == "GET":
+        # 获取弹幕消息队列
+        id = request.args.get('id')
+        # 存放在redis队列中的键值
+        key = "movie" + str(id)
+        if rd.llen(key):
+            msgs = rd.lrange(key, 0, 2999)
+            res = {
+                "code": 1,
+                "danmaku": [json.loads(v) for v in msgs]
+            }
+        else:
+            res = {
+                "code": 1,
+                "danmaku": []
+            }
+        resp = json.dumps(res)
+    if request.method == "POST":
+        # 添加弹幕
+        data = json.loads(request.get_data())
+        msg = {
+            "__v": 0,
+            "author": data["author"],
+            "time": data["time"],
+            "text": data["text"],
+            "color": data["color"],
+            "type": data['type'],
+            "ip": request.remote_addr,
+            "_id": datetime.now().strftime("%Y%m%d%H%M%S") + uuid.uuid4().hex,
+            "player": [
+                data["player"]
+            ]
+        }
+        res = {
+            "code": 1,
+            "data": msg
+        }
+        resp = json.dumps(res)
+        # 将添加的弹幕推入redis的队列中
+        rd.lpush("movie" + str(data["player"]), json.dumps(msg))
+    return Response(resp, mimetype='application/json')
