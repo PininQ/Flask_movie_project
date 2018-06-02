@@ -3,7 +3,10 @@
 
 {% block css %}
     <!--播放页面-->
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jwplayer/skins/stormtrooper.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='dplayer/dist/DPlayer.min.css') }}">
+    <script src="{{ url_for('static',filename='dplayer/plugin/flv.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='dplayer/plugin/hls.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='dplayer/dist/DPlayer.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='ueditor/ueditor.config.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='ueditor/ueditor.all.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='ueditor/lang/zh-cn/zh-cn.js') }}"></script>
@@ -19,12 +22,16 @@
     .container2{
             margin-top:76px
         }
+    .dplayer-comment-setting-type > label {
+            display: inline;
+        }
     </style>
 {% endblock %}
+
 {% block content %}
     <div class="row">
         <div class="col-md-8">
-            <div id="moviecontainer"></div>
+            <div id="dplayer1" style="height:500px;width: 774px;"></div>
         </div>
         <div class="col-md-4" style="height:500px;">
             <div class="panel panel-info">
@@ -100,7 +107,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-12" style="margin-top:6px;">
+         <div class="col-md-12" style="margin-top:6px;">
             <div class="panel panel-info">
                 <div class="panel-heading">
                     <h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span>&nbsp;电影评论</h3>
@@ -183,7 +190,7 @@
                         {% endfor %}
                     </ul>
                     <div class="col-md-12 text-center">
-                        {{ pg.page(page_data,'home.play',movie.id) }}
+                        {{ pg.page(page_data,'home.video',movie.id) }}
                     </div>
                 </div>
             </div>
@@ -192,7 +199,18 @@
 {% endblock %}
 {% block js %}
     <!--播放页面-->
-    <script src="{{ url_for('static',filename='jwplayer/jwplayer.js') }}"></script>
+    <script>
+        var dp1 = new DPlayer({
+            element: document.getElementById('dplayer1'),
+            video: {
+                url: "{{ url_for('static',filename='uploads/'+movie.url) }}",
+            },
+            danmaku: {
+                id: '{{ movie.id }}',
+                api: "/tm/"
+            }
+        });
+    </script>
     <script>
     var ue = UE.getEditor('input_content',{
         toolbars: [
@@ -201,33 +219,6 @@
         initialFrameWidth:"100%",
         initialFrameHeight:"100",
     });
-    </script>
-    <script type="text/javascript">
-        jwplayer.key = "P9VTqT/X6TSP4gi/hy1wy23BivBhjdzVjMeOaQ==";
-    </script>
-    <script type="text/javascript">
-        jwplayer("moviecontainer").setup({
-            flashplayer: "{{ url_for('static',filename='jwplayer/jwplayer.flash.swf') }}",
-            playlist: [{
-                file: "{{ url_for('static',filename='uploads/'+movie.url) }}",
-                title: "{{ movie.title }}"
-            }],
-            modes: [{
-                type: "html5"
-            }, {
-                type: "flash",
-                src: "{{ url_for('static',filename='jwplayer/jwplayer.flash.swf') }}"
-            }, {
-                type: "download"
-            }],
-            skin: {
-                name: "vapor"
-            },
-            "playlist.position": "left",
-            "playlist.size": 400,
-            height: 500,
-            width: 774,
-        });
     </script>
     <!--播放页面-->
     <script>
