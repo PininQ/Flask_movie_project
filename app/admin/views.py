@@ -14,7 +14,7 @@ import uuid
 from datetime import datetime
 
 # 分页个数
-PAGE_COUNT = 5
+PAGE_COUNT = 10
 
 
 # 上下应用处理器

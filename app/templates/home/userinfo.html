@@ -1,0 +1,103 @@
+{% extends 'home/home.html' %}
+{% import "ui/comment_page.html" as pg %}
+
+{% block css %}
+    <!--播放页面-->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jwplayer/skins/stormtrooper.css') }}">
+    <script type="text/javascript" src="{{ url_for('static',filename='ueditor/ueditor.config.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='ueditor/ueditor.all.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='ueditor/lang/zh-cn/zh-cn.js') }}"></script>
+    <script>
+        SyntaxHighlighter.all();
+    </script>
+    <!--播放页面-->
+    <style>
+    .container2{
+            margin-top:76px
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-4">
+            {% if user.face %}
+                <img src="{{ url_for('static',filename='uploads/users/'+user.face) }}"
+                     style="width: 200px;margin-left: 80px;margin-top: 30px;" class="img-responsive img-rounded">
+            {% else %}
+                <img data-src="holder.js/200x200" style="width: 200px;margin-left: 80px;margin-top: 30px;" class="img-responsive img-rounded">
+            {% endif %}
+        </div>
+        <div class="col-md-8 panel-body" style="height:300px;font-size: 16px;margin-top: 30px;">
+            <table class="table" style="width: 650px;border:none">
+                <tr>
+                    <td style="width:14%;font-weight:bold;border: none">会员名</td>
+                    <td style="border: none">{{ user.name }}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight:bold;">邮箱 </td>
+                    <td>{{ user.email }}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight:bold;">手机号码</td>
+                    <td>{{ user.phone }}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight:bold;">个人简介</td>
+                    {% if user.info %}
+                        <td>{{ user.info }}</td>
+                    {% else %}
+                        <td>无</td>
+                    {% endif %}
+                </tr>
+            </table>
+        </div>
+        <div class="col-md-12" style="margin-top:6px;">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span>&nbsp;Ta的动态&nbsp;({{ comment_count }})</h3>
+                </div>
+                <div class="panel-body">
+                    <ul class="commentList">
+                        {% for v in page_data.items %}
+                            <li class="item cl">
+                                <a href="#">
+                                    <i class="avatar size-L radius">
+                                        {% if v.user.face %}
+                                            <img alt="50x50" src="{{ url_for('static',filename='uploads/users/'+v.user.face) }}"
+                                                 class="img-circle" style="border:1px solid #abcdef;width: 50px;">
+                                        {% else %}
+                                            <img alt="50x50" data-src="holder.js/50x50"
+                                                 class="img-circle" style="border:1px solid #abcdef;width:50px;">
+                                        {% endif %}
+                                    </i>
+                                </a>
+                                <div class="comment-main">
+                                    <header class="comment-header">
+                                        <div class="comment-meta">
+                                            <a class="comment-author" href="#" style="text-decoration:none;">{{ v.user.name }}</a>
+                                            评论
+                                            <a href="{{ url_for('home.play',id=v.movie_id,page=1) }}" style="text-decoration:none;">
+                                                《{{ v.movie.title }}》
+                                            </a>于
+                                            <time title="{{ v.addtime }}" datetime="{{ v.addtime }}">{{ v.addtime }}</time>
+                                        </div>
+                                    </header>
+                                    <div class="comment-body">
+                                        <p>{{ v.content | safe }}</p>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="col-md-12 text-center" style="margin-top:6px;">
+                        {% if comment_count %}
+                            {{ pg.page(page_data,'home.user_info',user.id) }}
+                        {% else %}
+                            <p>空空如也，ta没有动态噢！</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

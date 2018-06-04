@@ -14,11 +14,11 @@
     <div class="col-md-12">
          <ol class="breadcrumb" style="margin-top:6px;">
             {% if movie_count == 0 %}
-                <li>没有找到任何资源</li>
+                <li>没有找到任何与“{{ key }}”有关的视频资源</li>
             {% elif key %}
-                <li>与"{{ key }}"有关的电影，共{{ movie_count }}部</li>
+                <li>与“{{ key }}”有关的视频资源，共{{ movie_count }}部</li>
             {% else %}
-                 <li>共{{ movie_count }}部电影</li>
+                 <li>本站所有视频资源，共{{ movie_count }}部</li>
             {% endif %}
         </ol>
     </div>
@@ -34,7 +34,7 @@
                 <h4 class="media-heading">
                     <a href="{{ url_for('home.play',id=v.id,page=1) }}" style="color: #000000;text-decoration:none; ">{{ v.title }}</a>
                     <a href="{{ url_for('home.play',id=v.id,page=1) }}" class="label label-primary pull-right">
-                    <span class="glyphicon glyphicon-play"></span>播放影片</a>
+                    <span class="glyphicon glyphicon-play"></span>播放视频</a>
                 </h4>
                 {{ v.info }}
             </div>

@@ -97,6 +97,7 @@ class MovieForm(FlaskForm):
         description="简介",
         render_kw={
             "class": "form-control",
+            "style": "resize:none;",
             "rows": 10
         }
     )

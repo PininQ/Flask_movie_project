@@ -45,7 +45,7 @@
         <div class="navbar-collapse collapse">
             <form class="navbar-form navbar-left" role="search" style="margin-top:18px;">
                 <div class="form-group input-group">
-                    <input type="text" class="form-control" placeholder="请输入电影名" id="key_movie">
+                    <input type="text" class="form-control" placeholder="请输入视频名称" id="key_movie">
                     <span class="input-group-btn">
                         <a class="btn btn-default" id="do_search"><span class="glyphicon glyphicon-search"></span>&nbsp;搜索</a>
                     </span>
@@ -53,20 +53,23 @@
             </form>
             <ul class="nav navbar-nav navbar-right">
                 <li>
-                    <a class="curlink" href="{{ url_for('home.index',page=1) }}"><span class="glyphicon glyphicon-film"></span>&nbsp;电影</a>
+                    <a class="curlink" href="{{ url_for('home.index',page=1) }}"><span class="glyphicon glyphicon-film"></span>&nbsp;首页</a>
                 </li>
+                {% if "user" not in session %}
                 <li>
                     <a class="curlink" href="{{ url_for('home.login') }}"><span class="glyphicon glyphicon-log-in"></span>&nbsp;登录</a>
                 </li>
                 <li>
                     <a class="curlink" href="{{ url_for('home.register') }}"><span class="glyphicon glyphicon-plus"></span>&nbsp;注册</a>
                 </li>
+                {% else %}
+                <li>
+                    <a class="curlink" href="{{ url_for('home.user') }}"><span class="glyphicon glyphicon-user"></span>&nbsp;{{ session['user'] }}</a>
+                </li>
                 <li>
                     <a class="curlink" href="{{ url_for('home.logout') }}"><span class="glyphicon glyphicon-log-out"></span>&nbsp;退出</a>
                 </li>
-                <li>
-                    <a class="curlink" href="{{ url_for('home.user') }}"><span class="glyphicon glyphicon-user"></span>&nbsp;会员</a>
-                </li>
+                {% endif %}
             </ul>
         </div>
         <!--导航-->
@@ -86,7 +89,7 @@
         <div class="row">
             <div class="col-md-12">
                 <p>
-                    ©&nbsp;2018&nbsp;flaskmovie.qinbin.com&nbsp;桂ICP备 13044669号-1
+                    ©&nbsp;2018&nbsp;xiaohuajiao.qinbin.com&nbsp;桂ICP备 13044669号-1
                 </p>
             </div>
         </div>

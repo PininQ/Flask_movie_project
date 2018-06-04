@@ -170,6 +170,32 @@ def user():
     return render_template('home/user.html', form=form, user=user)
 
 
+# ta主页及动态
+@home.route('/user/<int:id>/<int:page>/', methods=['GET'])
+@user_login_req
+def user_info(id=None, page=None):
+    user = User.query.get_or_404(int(id))
+    if page is None:
+        page = 1
+    # 电影评论个数
+    comment_count = Comment.query.join(
+        User
+    ).filter(
+        User.id == user.id
+    ).count()
+    page_data = Comment.query.join(
+        Movie
+    ).join(
+        User
+    ).filter(
+        Movie.id == Comment.movie_id,
+        User.id == user.id
+    ).order_by(
+        Comment.addtime.desc()
+    ).paginate(page=page, per_page=PAGE_COUNT)
+    return render_template('home/userinfo.html', user=user, comment_count=comment_count, page_data=page_data)
+
+
 # 修改密码
 @home.route('/pwd/', methods=['GET', 'POST'])
 @user_login_req
@@ -337,6 +363,11 @@ def index(page=None):
         cm=cm,
     )
     return render_template('home/index.html', movie_count=movie_count, tags=tags, p=p, page_data=page_data)
+
+
+@home.route('/')
+def index_home():
+    return redirect(url_for('home.index', page=1))
 
 
 # 首页上映预告：轮播动画
