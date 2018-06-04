@@ -36,9 +36,9 @@
         <div class="col-md-4" style="height:500px;">
             <div class="panel panel-info">
                 <div class="panel-heading">
-                    <h3 class="panel-title"><span class="glyphicon glyphicon-facetime-video"></span>&nbsp;电影介绍</h3>
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-facetime-video"></span>&nbsp;视频介绍</h3>
                 </div>
-                <div class="panel-body" style="height:459px;overflow:scroll;">
+                <div class="panel-body" style="height:459px;overflow:auto;">
                     <table class="table">
                         <tr>
                             <td style="width:30%;color:#ccc;font-weight:bold;font-style:italic;">
@@ -87,7 +87,7 @@
                         </tr>
                         <tr>
                             <td style="color:#ccc;font-weight:bold;font-style:italic;">
-                                <span class="glyphicon glyphicon-play"></span>&nbsp;播放数量
+                                <span class="glyphicon glyphicon-play"></span>&nbsp;播放次数
                             </td>
                             <td>{{ movie.playnum }}</td>
                         </tr>
@@ -99,7 +99,7 @@
                         </tr>
                         <tr>
                             <td style="color:#ccc;font-weight:bold;font-style:italic;">
-                                <span class="glyphicon glyphicon-picture"></span>&nbsp;影片介绍
+                                <span class="glyphicon glyphicon-picture"></span>&nbsp;视频介绍
                             </td>
                             <td>{{ movie.info }}</td>
                         </tr>
@@ -110,7 +110,7 @@
          <div class="col-md-12" style="margin-top:6px;">
             <div class="panel panel-danger">
                 <div class="panel-heading">
-                    <h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span>&nbsp;电影评论</h3>
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span>&nbsp;视频评论</h3>
                 </div>
                 <div class="panel-body">
                     {% if "user" not in session %}
@@ -157,9 +157,9 @@
                         {{ form.csrf_token }}
                         {{ form.submit }}
                         &nbsp;
-                        <a class="btn btn-danger" id="btn-col"><span class="glyphicon glyphicon-heart"></span>&nbsp;收藏电影</a>
+                        <a class="btn btn-danger" id="btn-col"><span class="glyphicon glyphicon-heart"></span>&nbsp;收藏视频</a>
                     </form>
-                        {#通过ajax异步方法添加电影收藏#}
+                        {#通过ajax异步方法添加视频收藏#}
                         <div class="col-md-12">
                             <h4 style="color:green" id="show_col_msg"></h4>
                         </div>
@@ -168,7 +168,7 @@
                     <ul class="commentList">
                         {% for v in page_data.items %}
                         <li class="item cl">
-                            <a href="user.html">
+                            <a href="{{ url_for("home.user_info",id=v.user.id,page=1) }}" target="_blank">
                                 <i class="avatar size-L radius">
                                     {% if v.user.face %}
                                         <img alt="50x50" src="{{ url_for('static',filename='uploads/users/'+v.user.face) }}"
@@ -181,7 +181,9 @@
                             <div class="comment-main">
                                 <header class="comment-header">
                                     <div class="comment-meta">
-                                        <a class="comment-author" href="#">{{ v.user.name }}</a>
+                                        <a class="comment-author" href="{{ url_for("home.user_info",id=v.user.id,page=1) }}" target="_blank">
+                                            {{ v.user.name }}
+                                        </a>
                                         评论于
                                         <time title="{{ v.addtime }}" datetime="{{ v.addtime }}">{{ v.addtime }}</time>
                                     </div>

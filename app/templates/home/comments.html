@@ -24,7 +24,7 @@
             <ul class="commentList">
                 {% for v in page_data.items %}
                     <li class="item cl">
-                        <a href="user.html">
+                        <a href="#">
                             <i class="avatar size-L radius">
                                 {% if v.user.face %}
                                     <img alt="50x50" src="{{ url_for('static',filename='uploads/users/'+v.user.face) }}"
@@ -38,9 +38,12 @@
                         <div class="comment-main">
                             <header class="comment-header">
                                 <div class="comment-meta">
-                                    <a class="comment-author" href="user.html">{{ v.user.name }}</a>
-                                    评论<a style="text-decoration:none;">《{{ v.movie.title }}》</a>于
-                                    <time title="{{ v.addtime }}" datetime="{{ v.addtime }}">{{ v.addtime }}</time>
+                                    <a class="comment-author" style="text-decoration:none;">{{ v.user.name }}</a>
+                                    评论
+                                    <a href="{{ url_for('home.play',id=v.movie_id,page=1) }}" style="text-decoration:none;">
+                                        《{{ v.movie.title }}》
+                                    </a>
+                                    于<time title="{{ v.addtime }}" datetime="{{ v.addtime }}">{{ v.addtime }}</time>
                                 </div>
                             </header>
                             <div class="comment-body">
@@ -50,13 +53,13 @@
                     </li>
                 {% endfor %}
             </ul>
-                <div class="col-md-12 text-center" style="margin-top:6px;">
-                    {% if comment_count %}
-                        {{ pg.page(page_data,'home.comments') }}
-                    {% else %}
-                        <p>空空如也，快去评论电影吧！</p>
-                    {% endif %}
-                </div>
+            <div class="col-md-12 text-center" style="margin-top:6px;">
+                {% if comment_count %}
+                    {{ pg.page(page_data,'home.comments') }}
+                {% else %}
+                    <p>空空如也，快去评论视频吧！</p>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>

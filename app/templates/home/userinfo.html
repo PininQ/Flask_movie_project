@@ -42,19 +42,19 @@
                     <td>{{ user.phone }}</td>
                 </tr>
                 <tr>
-                    <td style="font-weight:bold;">评论个数</td>
-                    <td>{{ comment_count }}</td>
-                </tr>
-                <tr>
                     <td style="font-weight:bold;">个人简介</td>
-                    <td>{{ user.info }}</td>
+                    {% if user.info %}
+                        <td>{{ user.info }}</td>
+                    {% else %}
+                        <td>无</td>
+                    {% endif %}
                 </tr>
             </table>
         </div>
         <div class="col-md-12" style="margin-top:6px;">
             <div class="panel panel-info">
                 <div class="panel-heading">
-                    <h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span>&nbsp;ta的动态</h3>
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span>&nbsp;Ta的动态&nbsp;({{ comment_count }})</h3>
                 </div>
                 <div class="panel-body">
                     <ul class="commentList">
@@ -74,8 +74,11 @@
                                 <div class="comment-main">
                                     <header class="comment-header">
                                         <div class="comment-meta">
-                                            <a class="comment-author" href="#">{{ v.user.name }}</a>
-                                            评论<a style="text-decoration:none;">《{{ v.movie.title }}》</a>于
+                                            <a class="comment-author" href="#" style="text-decoration:none;">{{ v.user.name }}</a>
+                                            评论
+                                            <a href="{{ url_for('home.play',id=v.movie_id,page=1) }}" style="text-decoration:none;">
+                                                《{{ v.movie.title }}》
+                                            </a>于
                                             <time title="{{ v.addtime }}" datetime="{{ v.addtime }}">{{ v.addtime }}</time>
                                         </div>
                                     </header>
@@ -90,7 +93,7 @@
                         {% if comment_count %}
                             {{ pg.page(page_data,'home.user_info',user.id) }}
                         {% else %}
-                            <p>空空如也，快去评论视频吧！</p>
+                            <p>空空如也，ta没有动态噢！</p>
                         {% endif %}
                     </div>
                 </div>

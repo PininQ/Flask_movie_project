@@ -15,7 +15,7 @@ import os
 from datetime import datetime
 
 # 分页个数
-PAGE_COUNT = 3
+PAGE_COUNT = 10
 
 
 # 登录装饰器

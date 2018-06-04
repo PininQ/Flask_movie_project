@@ -25,7 +25,7 @@
 <div class="col-md-9">
     <div class="panel panel-warning">
         <div class="panel-heading">
-            <h3 class="panel-title"><span class="glyphicon glyphicon-map-marker"></span>&nbsp;收藏电影</h3>
+            <h3 class="panel-title"><span class="glyphicon glyphicon-map-marker"></span>&nbsp;收藏视频</h3>
         </div>
         <div class="panel-body">
             <div class="col-md-12">
@@ -44,7 +44,7 @@
                                 {{ v.movie.title }}
                             </a>
                             <a href="{{ url_for('home.play',id=v.movie_id,page=1) }}" class="label label-primary pull-right">
-                                <span class="glyphicon glyphicon-play"></span>播放影片</a>
+                                <span class="glyphicon glyphicon-play"></span>播放视频</a>
                         </h4>
                         {{ v.movie.info }}
                     </div>
@@ -55,7 +55,7 @@
                 {% if moviecol_count %}
                     {{ pg.page(page_data,'home.moviecol') }}
                 {% else %}
-                    <p>空空如也，快去收藏电影吧！</p>
+                    <p>空空如也，快去收藏视频吧！</p>
                 {% endif %}
             </div>
         </div>
