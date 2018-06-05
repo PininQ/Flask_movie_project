@@ -69,7 +69,8 @@ def login():
         for user in users:
             if user:
                 if not user.check_pwd(data['pwd']):
-                    flash("密码不正确！", "err")
+                    # flash("密码不正确！", "err")
+                    flash("登录名或登录密码不正确！", "err")
                     return redirect(url_for("home.login"))
                 session["user"] = user.name
                 session["user_id"] = user.id
@@ -83,7 +84,8 @@ def login():
                 db.session.add(userlog)
                 db.session.commit()
                 return redirect(url_for("home.user"))
-        flash("用户不存在，请重新输入!", "err")
+        # flash("用户不存在，请重新输入!", "err")
+        flash("登录名或登录密码不正确!", "err")
         return redirect(url_for("home.login"))
     return render_template('home/login.html', form=form)
 
@@ -122,6 +124,9 @@ def register():
 def user():
     form = UserdetailForm()
     user = User.query.get(int(session['user_id']))
+    # 修改会员名之后需要重新获取user.name
+    if session["user"] != user.name:
+        session["user"] = user.name
     form.face.validators = []
     if request.method == 'GET':
         form.name.data = user.name
