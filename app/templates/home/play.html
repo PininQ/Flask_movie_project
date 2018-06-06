@@ -115,9 +115,7 @@
                             <strong>请先<a href="{{ url_for('home.login') }}" target="_blank" class="text-info">登录</a>，才可参与评论！</strong>
                         </div>
                     {% endif %}
-                    <ol class="breadcrumb" style="margin-top:6px;">
-                        <li>全部评论({{ movie.commentnum }})</li>
-                    </ol>
+
                     {% if "user" in session %}
                         {% for msg in get_flashed_messages(category_filter=["ok"]) %}
                             <div class="alert alert-success alert-dismissible">
@@ -158,6 +156,9 @@
                         </div>
                         <div class="clearfix"></div>
                     {% endif %}
+                    <ol class="breadcrumb" style="margin-top:6px;">
+                        <li>全部评论({{ movie.commentnum }})</li>
+                    </ol>
                     <ul class="commentList">
                         {% for v in page_data.items %}
                         <li class="item cl">
@@ -189,7 +190,11 @@
                         {% endfor %}
                     </ul>
                     <div class="col-md-12 text-center">
-                        {{ pg.page(page_data,'home.play',movie.id) }}
+                        {% if movie.commentnum %}
+                            {{ pg.page(page_data,'home.play',movie.id) }}
+                        {% else %}
+                            <p>还没有评论，快来第一个评论吧！</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>

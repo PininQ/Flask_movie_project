@@ -2,8 +2,8 @@
 __author__ = 'QB'
 from . import home
 from flask import render_template, redirect, url_for, flash, session, request, Response
-from app.home.forms import RegisterForm, LoginForm, UserdetailForm, PwdForm, CommentForm
-from app.models import User, Userlog, Preview, Tag, Movie, Comment, Moviecol
+from app.home.forms import RegisterForm, LoginForm, UserdetailForm, PwdForm, CommentForm,SuggestForm
+from app.models import User, Userlog, Preview, Tag, Movie, Comment, Moviecol,Suggest
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 from app import db, app, rd
@@ -69,7 +69,8 @@ def login():
         for user in users:
             if user:
                 if not user.check_pwd(data['pwd']):
-                    flash("密码不正确！", "err")
+                    # flash("密码不正确！", "err")
+                    flash("登录名或登录密码不正确！", "err")
                     return redirect(url_for("home.login"))
                 session["user"] = user.name
                 session["user_id"] = user.id
@@ -83,7 +84,8 @@ def login():
                 db.session.add(userlog)
                 db.session.commit()
                 return redirect(url_for("home.user"))
-        flash("用户不存在，请重新输入!", "err")
+        # flash("用户不存在，请重新输入!", "err")
+        flash("登录名或登录密码不正确!", "err")
         return redirect(url_for("home.login"))
     return render_template('home/login.html', form=form)
 
@@ -122,6 +124,9 @@ def register():
 def user():
     form = UserdetailForm()
     user = User.query.get(int(session['user_id']))
+    # 修改会员名之后需要重新获取user.name
+    if session["user"] != user.name:
+        session["user"] = user.name
     form.face.validators = []
     if request.method == 'GET':
         form.name.data = user.name
@@ -244,6 +249,12 @@ def comments(page=None):
 @home.route('/loginlog/<int:page>/', methods=['GET'])
 @user_login_req
 def loginlog(page=None):
+    # 登录次数
+    loginlog_count = Userlog.query.join(
+        User
+    ).filter(
+        User.id == session['user_id']
+    ).count()
     if page is None:
         page = 1
     page_data = Userlog.query.filter_by(
@@ -251,7 +262,7 @@ def loginlog(page=None):
     ).order_by(
         Userlog.addtime.desc()
     ).paginate(page=page, per_page=PAGE_COUNT)
-    return render_template('home/loginlog.html', page_data=page_data)
+    return render_template('home/loginlog.html', loginlog_count=loginlog_count, page_data=page_data)
 
 
 # 添加电影收藏
@@ -302,6 +313,25 @@ def moviecol(page=None):
         Moviecol.addtime.desc()
     ).paginate(page=page, per_page=PAGE_COUNT)
     return render_template('home/moviecol.html', moviecol_count=moviecol_count, page_data=page_data)
+
+
+# 网站建议
+@home.route('/suggest/', methods=['GET', 'POST'])
+@user_login_req
+def suggest_add():
+    form = SuggestForm()
+    if form.validate_on_submit():
+        data = form.data
+        suggest = Suggest(
+            user_id=session['user_id'],
+            title=data['title'],
+            content=data['content']
+        )
+        db.session.add(suggest)
+        db.session.commit()
+        flash("网站建议提交成功，非常感谢您提出的建议！", "ok")
+        return redirect(url_for("home.suggest_add"))
+    return render_template('home/suggest.html', form=form)
 
 
 # 首页电影列表

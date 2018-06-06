@@ -3,7 +3,7 @@ __author__ = 'QB'
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, FileField, TextAreaField
-from wtforms.validators import DataRequired, Email, Regexp, EqualTo, ValidationError
+from wtforms.validators import DataRequired, Email, Regexp, EqualTo, ValidationError, Length
 from app.models import User
 
 
@@ -13,6 +13,7 @@ class RegisterForm(FlaskForm):
         label="会员名",
         validators=[
             DataRequired("会员名不能为空!"),
+            Length(1, 12, "会员名不能超过12个字符")
         ],
         description="会员名",
         render_kw={
@@ -25,7 +26,8 @@ class RegisterForm(FlaskForm):
         validators=[
             DataRequired("邮箱不能为空!"),
             # Email("邮箱格式不正确！"),
-            Regexp("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$", message="邮箱格式不正确！")
+            Regexp("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$", message="邮箱格式不正确！"),
+            Length(5, 50, "邮箱长度最大为50个字符")
         ],
         description="邮箱",
         render_kw={
@@ -48,7 +50,9 @@ class RegisterForm(FlaskForm):
     pwd = PasswordField(
         label="密码",
         validators=[
-            DataRequired("密码不能为空！")
+            DataRequired("密码不能为空！"),
+            Length(6, 18, "密码为6-18个字符！"),
+            Regexp("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,18}$", message="密码需要包含字母和数字！")
         ],
         description="密码",
         render_kw={
@@ -60,7 +64,9 @@ class RegisterForm(FlaskForm):
         label="确认密码",
         validators=[
             DataRequired("确认密码不能为空！"),
-            EqualTo('pwd', message='两次输入密码不一致')
+            EqualTo('pwd', message='两次输入密码不一致'),
+            Length(6, 18, "密码为6-18个字符！"),
+            Regexp("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,18}$", message="密码需要包含字母和数字！")
         ],
         description="确认密码",
         render_kw={
@@ -77,6 +83,9 @@ class RegisterForm(FlaskForm):
 
     def validate_name(self, field):
         name = field.data
+        for v in name:
+            if v == ' ' or v == '\t' or v == '\r':
+                raise ValidationError("会员名不能包含空格！")
         user = User.query.filter_by(name=name).count()
         if user == 1:
             raise ValidationError("昵称已经存在！")
@@ -130,6 +139,7 @@ class UserdetailForm(FlaskForm):
         label="会员名",
         validators=[
             DataRequired("会员名不能为空!"),
+            Length(1, 12, "会员名不能超过12个字符")
         ],
         description="会员名",
         render_kw={
@@ -142,7 +152,8 @@ class UserdetailForm(FlaskForm):
         validators=[
             DataRequired("邮箱不能为空!"),
             # Email("邮箱格式不正确！"),
-            Regexp("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$", message="邮箱格式不正确！")
+            Regexp("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$", message="邮箱格式不正确！"),
+            Length(5, 50, "邮箱长度最大为50个字符")
         ],
         description="邮箱",
         render_kw={
@@ -174,15 +185,16 @@ class UserdetailForm(FlaskForm):
     )
     info = TextAreaField(
         label="简介",
-        # validators=[
-        #     DataRequired("简介不能为空！")
-        # ],
+        validators=[
+            # DataRequired("简介不能为空！"),
+            Length(max=150, message="个人简介不能超过150个字符")
+        ],
         description="简介",
         render_kw={
             "class": "form-control",
             "placeholder": "请输入简介",
-            "style": "resize:none;",
-            "rows": 10
+            "style": "resize:none;font-size:16px",
+            "rows": 4
         }
     )
     submit = SubmitField(
@@ -197,7 +209,7 @@ class PwdForm(FlaskForm):
     old_pwd = PasswordField(
         label="旧密码",
         validators=[
-            DataRequired("旧密码不能为空！")
+            DataRequired("旧密码不能为空！"),
         ],
         description="旧密码",
         render_kw={
@@ -209,6 +221,8 @@ class PwdForm(FlaskForm):
         label="新密码",
         validators=[
             DataRequired("新密码不能为空！"),
+            Length(6, 18, "密码为6-18个字符！"),
+            Regexp("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,18}$", message="密码需要包含字母和数字！")
         ],
         description="新密码",
         render_kw={
@@ -220,7 +234,9 @@ class PwdForm(FlaskForm):
         label="确认密码",
         validators=[
             DataRequired("确认密码不能为空！"),
-            EqualTo('new_pwd', message='两次输入密码不一致')
+            EqualTo('new_pwd', message='两次输入密码不一致'),
+            Length(6, 18, "密码为6-18个字符！"),
+            Regexp("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,18}$", message="密码需要包含字母和数字！")
         ],
         description="确认密码",
         render_kw={
@@ -249,6 +265,41 @@ class CommentForm(FlaskForm):
     )
     submit = SubmitField(
         "提交评论",
+        render_kw={
+            "class": "btn btn-success",
+            "id": "btn-sub"
+        }
+    )
+
+
+class SuggestForm(FlaskForm):
+    title = StringField(
+        label="标题",
+        validators=[
+            DataRequired("标题不能为空!"),
+        ],
+        description="标题",
+        render_kw={
+            "class": "form-control",
+            "placeholder": "标题"
+        }
+    )
+    content = TextAreaField(
+        label="内容",
+        validators=[
+            DataRequired("内容不能为空!"),
+            Length(max=500, message="内容不能超过500个字符")
+        ],
+        description="内容",
+        render_kw={
+            "class": "form-control",
+            "placeholder": "内容",
+            "style": "resize:none;font-size:16px",
+            "rows": 10
+        }
+    )
+    submit = SubmitField(
+        "提交建议",
         render_kw={
             "class": "btn btn-success",
             "id": "btn-sub"

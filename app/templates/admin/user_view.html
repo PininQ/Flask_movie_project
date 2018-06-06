@@ -32,23 +32,23 @@
                         <table class="table table-hover">
                             <tbody>
                             <tr>
-                                <td class="td_bd">编号：</td>
+                                <td class="td_bd" style="width:20%;text-align: right;">编号：</td>
                                 <td>{{ user.id }}</td>
                             </tr>
                             <tr>
-                                <td class="td_bd">昵称：</td>
+                                <td class="td_bd" style="width:20%;text-align: right;">昵称：</td>
                                 <td>{{ user.name }}</td>
                             </tr>
                             <tr>
-                                <td class="td_bd">邮箱：</td>
+                                <td class="td_bd" style="width:20%;text-align: right;">邮箱：</td>
                                 <td>{{ user.email }}</td>
                             </tr>
                             <tr>
-                                <td class="td_bd">手机：</td>
+                                <td class="td_bd" style="width:20%;text-align: right;">手机：</td>
                                 <td>{{ user.phone }}</td>
                             </tr>
                             <tr>
-                                <td class="td_bd">头像：</td>
+                                <td class="td_bd" style="width:20%;text-align: right;">头像：</td>
                                 <td>
 {#                                    <img style="width: 100px;" src="{{ url_for('static',filename='uploads/users/'+user.face) }}"#}
 {#                                         class="img-responsive" alt="">#}
@@ -61,16 +61,20 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="td_bd">注册时间：</td>
+                                <td class="td_bd" style="width:20%;text-align: right;">注册时间：</td>
                                 <td>{{ user.addtime }}</td>
                             </tr>
                             <tr>
-                                <td class="td_bd">唯一标志符：</td>
+                                <td class="td_bd" style="width:20%;text-align: right;">唯一标志符：</td>
                                 <td>{{ user.uuid }}</td>
                             </tr>
                             <tr>
-                                <td class="td_bd">个性简介：</td>
-                                <td>{{ user.info }}</td>
+                                <td class="td_bd" style="width:20%;text-align: right;">个性简介：</td>
+                                {% if user.info %}
+                                    <td>{{ user.info }}</td>
+                                {% else %}
+                                    <td>无</td>
+                                {% endif %}
                             </tr>
                             </tbody>
                         </table>
