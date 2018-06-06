@@ -270,3 +270,38 @@ class CommentForm(FlaskForm):
             "id": "btn-sub"
         }
     )
+
+
+class SuggestForm(FlaskForm):
+    title = StringField(
+        label="标题",
+        validators=[
+            DataRequired("标题不能为空!"),
+        ],
+        description="标题",
+        render_kw={
+            "class": "form-control",
+            "placeholder": "标题"
+        }
+    )
+    content = TextAreaField(
+        label="内容",
+        validators=[
+            DataRequired("内容不能为空!"),
+            Length(max=500, message="内容不能超过500个字符")
+        ],
+        description="内容",
+        render_kw={
+            "class": "form-control",
+            "placeholder": "内容",
+            "style": "resize:none;font-size:16px",
+            "rows": 10
+        }
+    )
+    submit = SubmitField(
+        "提交建议",
+        render_kw={
+            "class": "btn btn-success",
+            "id": "btn-sub"
+        }
+    )

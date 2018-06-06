@@ -44,8 +44,10 @@
                     {% endfor %}
                 </table>
                 <div class="col-md-12 text-center" style="margin-top:6px;">
-                    {% if page_data %}
+                    {% if loginlog_count %}
                         {{ pg.page(page_data,'home.loginlog') }}
+                    {% else %}
+                        <p>该用户还没有登录日志！</p>
                     {% endif %}
                 </div>
             </div>

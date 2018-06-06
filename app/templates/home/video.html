@@ -197,7 +197,11 @@
                         {% endfor %}
                     </ul>
                     <div class="col-md-12 text-center">
-                        {{ pg.page(page_data,'home.video',movie.id) }}
+                        {% if movie.commentnum %}
+                            {{ pg.page(page_data,'home.video',movie.id) }}
+                        {% else %}
+                            <p>还没有评论，快来第一个评论吧！</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>

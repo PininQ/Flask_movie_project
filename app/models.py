@@ -21,6 +21,7 @@ class User(db.Model):
     userlogs = db.relationship('Userlog', backref='user')  # 会员日志外键关系关联
     comments = db.relationship('Comment', backref='user')  # 评论外键关系关联
     moviecols = db.relationship('Moviecol', backref='user')  # 电影收藏外键关系关联
+    suggests = db.relationship('Suggest', backref='user')  # 网站建议外键关系关联
 
     def __repr__(self):
         return '<User %r>' % self.name
@@ -191,6 +192,19 @@ class Oplog(db.Model):
     def __repr__(self):
         return '<Oplog %r>' % self.id
 
+
+class Suggest(db.Model):
+    """网站建议数据模型"""
+    __tablename__ = 'suggest'
+    id = db.Column(db.Integer, primary_key=True)  # 编号
+    # （下面是设置外键的第一步）:指向user表的id字段
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # 所属会员
+    title = db.Column(db.String(100))  # 标题
+    content = db.Column(db.String(600))  # 网站建议内容
+    addtime = db.Column(db.DateTime, index=True, default=datetime.now)  # 提交时间
+
+    def __repr__(self):
+        return '<Suggest %r>' % self.id
 
 # # 执行创建表语句
 # if __name__ == '__main__':

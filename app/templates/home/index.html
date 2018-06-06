@@ -1,6 +1,14 @@
 {% extends "home/layout.html" %}
 {% import 'ui/home_page.html' as pg %}
 
+{% block css %}
+    <style>
+        .td_16{
+            font-size:16px;
+            font-weight: bold;
+        }
+    </style>
+{% endblock %}
 {% block content %}
 <!--热门视频-->
 <section id="hotmovie" style="margin-top:76px">
@@ -18,32 +26,32 @@
     <div class="container">
         <div class="row wow fadeIn" data-wow-delay="0.6s">
             <div class="col-md-12 table-responsive">
-                <table class="table text-left table-bordered" id="movietags">
+                <table class="table text-left table-bordered td_16" id="movietags">
                     <tr>
-                        <td style="width:10%;">视频标签</td>
+                        <td class="text-center" style="width:15%;">视频标签</td>
                         <td style="width:90%;">
                             {% for v in tags %}
-                            <a href="{{ url_for("home.index",page=1) }}?tid={{ v.id }}&star={{ p['star'] }}&time={{ p['time'] }}&pm={{ p['pm'] }}&cm={{ p['cm'] }}" class="label label-info">
+                            <a style="font-size:14px;margin: 3px;" href="{{ url_for("home.index",page=1) }}?tid={{ v.id }}&star={{ p['star'] }}&time={{ p['time'] }}&pm={{ p['pm'] }}&cm={{ p['cm'] }}" class="label label-info ">
                                 <span class="glyphicon glyphicon-tag"></span>&nbsp;{{ v.name }}
                             </a>&nbsp;
                             {% endfor %}
                         </td>
                     </tr>
                     <tr>
-                        <td>视频星级</td>
+                        <td class="text-center">视频星级</td>
                         <td>
                             {% for v in range(1,6) %}
-                            <a href="{{ url_for("home.index",page=1) }}?tid={{ p['tid'] }}&star={{ v }}&time={{ p['time'] }}&pm={{ p['pm'] }}&cm={{ p['cm'] }}" class="label label-warning">
+                            <a style="font-size:14px;margin: 3px;" href="{{ url_for("home.index",page=1) }}?tid={{ p['tid'] }}&star={{ v }}&time={{ p['time'] }}&pm={{ p['pm'] }}&cm={{ p['cm'] }}" class="label label-warning">
                                 <span class="glyphicon glyphicon-star"></span>&nbsp;{{ v }}星</a>&nbsp;
                             {% endfor %}
                         </td>
                     </tr>
                     <tr>
-                        <td>上映时间</td>
+                        <td class="text-center">上映时间</td>
                         <td>
-                            <a href="{{ url_for("home.index",page=1) }}?tid={{ p['tid'] }}&star={{ p['star'] }}&time=1&pm={{ p['pm'] }}&cm={{ p['cm'] }}" class="label label-default">
+                            <a style="font-size:14px;margin: 3px;" href="{{ url_for("home.index",page=1) }}?tid={{ p['tid'] }}&star={{ p['star'] }}&time=1&pm={{ p['pm'] }}&cm={{ p['cm'] }}" class="label label-default">
                                 <span class="glyphicon glyphicon-time"></span>&nbsp;最近</a>&nbsp;
-                            <a href="{{ url_for("home.index",page=1) }}?tid={{ p['tid'] }}&star={{ p['star'] }}&time=2&pm={{ p['pm'] }}&cm={{ p['cm'] }}" class="label label-default">
+                            <a style="font-size:14px;margin: 3px;" href="{{ url_for("home.index",page=1) }}?tid={{ p['tid'] }}&star={{ p['star'] }}&time=2&pm={{ p['pm'] }}&cm={{ p['cm'] }}" class="label label-default">
                                 <span class="glyphicon glyphicon-time"></span>&nbsp;更早</a>
 {#                            <a class="label label-default"><span class="glyphicon glyphicon-time"></span>&nbsp;2017</span></a>#}
 {#                            &nbsp;#}
@@ -54,20 +62,20 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>播放次数</td>
+                        <td class="text-center">播放次数</td>
                         <td>
-                            <a href="{{ url_for("home.index",page=1) }}?tid={{ p['tid'] }}&star={{ p['star'] }}&time={{ p['time'] }}&pm=1&cm={{ p['cm'] }}" class="label label-success">
+                            <a style="font-size:14px;margin: 3px;" href="{{ url_for("home.index",page=1) }}?tid={{ p['tid'] }}&star={{ p['star'] }}&time={{ p['time'] }}&pm=1&cm={{ p['cm'] }}" class="label label-success">
                                 <span class="glyphicon glyphicon-arrow-down"></span>&nbsp;从高到底</a>&nbsp;
-                            <a href="{{ url_for("home.index",page=1) }}?tid={{ p['tid'] }}&star={{ p['star'] }}&time={{ p['time'] }}&pm=2&cm={{ p['cm'] }}" class="label label-danger">
+                            <a style="font-size:14px;margin: 3px;" href="{{ url_for("home.index",page=1) }}?tid={{ p['tid'] }}&star={{ p['star'] }}&time={{ p['time'] }}&pm=2&cm={{ p['cm'] }}" class="label label-danger">
                                 <span class="glyphicon glyphicon-arrow-up"></span>&nbsp;从低到高</a>
                         </td>
                     </tr>
                     <tr>
-                        <td>评论数量</td>
+                        <td class="text-center">评论数量</td>
                         <td>
-                            <a href="{{ url_for("home.index",page=1) }}?tid={{ p['tid'] }}&star={{ p['star'] }}&time={{ p['time'] }}&pm={{ p['pm'] }}&cm=1" class="label label-success">
+                            <a style="font-size:14px;margin: 3px;" href="{{ url_for("home.index",page=1) }}?tid={{ p['tid'] }}&star={{ p['star'] }}&time={{ p['time'] }}&pm={{ p['pm'] }}&cm=1" class="label label-success">
                                 <span class="glyphicon glyphicon-arrow-down"></span>&nbsp;从高到底</a>&nbsp;
-                            <a href="{{ url_for("home.index",page=1) }}?tid={{ p['tid'] }}&star={{ p['star'] }}&time={{ p['time'] }}&pm={{ p['pm'] }}&cm=2" class="label label-danger">
+                            <a style="font-size:14px;margin: 3px;" href="{{ url_for("home.index",page=1) }}?tid={{ p['tid'] }}&star={{ p['star'] }}&time={{ p['time'] }}&pm={{ p['pm'] }}&cm=2" class="label label-danger">
                                 <span class="glyphicon glyphicon-arrow-up"></span>&nbsp;从低到高</a>
                         </td>
                     </tr>
