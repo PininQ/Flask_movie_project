@@ -89,8 +89,8 @@ def admin_page(model_name):
 
 
 # 根据API查询IP的地理位置
-def admin_address():
-    ipaddr = json.load(urllib.request.urlopen('http://httpbin.org/ip'))['origin']
+def admin_address(ipaddr):
+    # ipaddr = json.load(urllib.request.urlopen('http://httpbin.org/ip'))['origin']
     # 组成查询ip地理位置的网址
     url = 'http://ip.taobao.com/service/getIpInfo.php?ip=%s' % (ipaddr)
     # 访问url地址, urlobject是<type 'instance'>对象；
@@ -99,9 +99,9 @@ def admin_address():
     res = json.loads(urlcontent)
     # print(res)
     # 显示查询结果
-    ip = res['data']['ip']
+    # ip = res['data']['ip']
     address = res['data']['country'] + res['data']['region'] + res['data']['city'] + " " + res['data']['isp']
-    return ip, address
+    return address
 
 
 # 首页：调用蓝图(app/admin/views.py)
@@ -127,7 +127,8 @@ def login():
         # 定义session保存会话
         session['admin'] = data['account']
         session["admin_id"] = admin.id
-        ip, address = admin_address()
+        ip = request.remote_addr
+        address = admin_address(ip)
         adminlog = Adminlog(
             admin_id=admin.id,
             # ip=request.remote_addr
@@ -187,7 +188,8 @@ def tag_add():
         )
         db.session.add(tag)
         db.session.commit()
-        ip, address = admin_address()
+        ip = request.remote_addr
+        address = admin_address(ip)
         oplog = Oplog(
             admin_id=session['admin_id'],
             # 获取ip地址
@@ -373,12 +375,20 @@ def movie_edit(id=None):
             file_url = secure_filename(form.url.data.filename)
             movie.url = change_filename(file_url)
             form.url.data.save(app.config["UP_DIR"] + movie.url)
+            # 删除本地的视频
+            if os.path.exists(app.config['UP_DIR'] + movie.url):
+                os.remove(app.config['UP_DIR'] + movie.url)
+            print("movie.url:" + app.config['UP_DIR'] + movie.url)
 
         # 上传logo
         if form.logo.data != '':  # 说明已经重新上传了封面
             file_logo = secure_filename(form.logo.data.filename)
             movie.logo = change_filename(file_logo)
             form.logo.data.save(app.config["UP_DIR"] + movie.logo)
+            # 删除本地的封面
+            if os.path.exists(app.config['UP_DIR'] + movie.logo):
+                os.remove(app.config['UP_DIR'] + movie.logo)
+            print("movie.logo:" + app.config['UP_DIR'] + movie.logo)
 
         movie.title = data['title']
         movie.info = data['info']
@@ -485,6 +495,10 @@ def preview_edit(id=None):
             file_logo = secure_filename(form.logo.data.filename)
             preview.logo = change_filename(file_logo)
             form.logo.data.save(app.config['UP_DIR'] + preview.logo)
+            # 删除旧的上映预告
+            if os.path.exists(app.config['UP_DIR'] + preview.logo):
+                os.remove(app.config['UP_DIR'] + preview.logo)
+            print("preview.logo:" + app.config['UP_DIR'] + preview.logo)
 
         preview.title = data['title']
         db.session.add(preview)
