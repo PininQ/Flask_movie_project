@@ -2,8 +2,8 @@
 __author__ = 'QB'
 from . import home
 from flask import render_template, redirect, url_for, flash, session, request, Response
-from app.home.forms import RegisterForm, LoginForm, UserdetailForm, PwdForm, CommentForm,SuggestForm
-from app.models import User, Userlog, Preview, Tag, Movie, Comment, Moviecol,Suggest
+from app.home.forms import RegisterForm, LoginForm, UserdetailForm, PwdForm, CommentForm, SuggestForm
+from app.models import User, Userlog, Preview, Tag, Movie, Comment, Moviecol, Suggest
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 from app import db, app, rd
@@ -38,8 +38,8 @@ def change_filename(filename):
 
 
 # 根据API查询IP的地理位置
-def admin_address():
-    ipaddr = json.load(urllib.request.urlopen('http://httpbin.org/ip'))['origin']
+def admin_address(ipaddr):
+    # ipaddr = json.load(urllib.request.urlopen('http://httpbin.org/ip'))['origin']
     # 组成查询ip地理位置的网址
     url = 'http://ip.taobao.com/service/getIpInfo.php?ip=%s' % (ipaddr)
     # 访问url地址, urlobject是<type 'instance'>对象；
@@ -48,9 +48,9 @@ def admin_address():
     res = json.loads(urlcontent)
     # print(res)
     # 显示查询结果
-    ip = res['data']['ip']
+    # ip = res['data']['ip']
     address = res['data']['country'] + res['data']['region'] + res['data']['city'] + " " + res['data']['isp']
-    return ip, address
+    return address
 
 
 # 登录：调用蓝图(app/home/views.py)
@@ -74,7 +74,8 @@ def login():
                     return redirect(url_for("home.login"))
                 session["user"] = user.name
                 session["user_id"] = user.id
-                ip, address = admin_address()
+                ip = request.remote_addr
+                address = admin_address(ip)
                 userlog = Userlog(
                     user_id=user.id,
                     # ip=request.remote_addr
@@ -142,8 +143,9 @@ def user():
         if form.face.data != '':  # 说明已经重新上传了头像
             if user.face is not None:
                 # 如果有头像，删除本地的头像。保存新的头像在本地
-                if os.path.exists(app.config['UP_DIR'] + user.face):
-                    os.remove(app.config['UP_DIR'] + user.face)
+                if os.path.exists(app.config['FC_DIR'] + user.face):
+                    os.remove(app.config['FC_DIR'] + user.face)
+            print("user.face:" + app.config['FC_DIR'] + user.face)
             file_face = secure_filename(form.face.data.filename)
             user.face = change_filename(file_face)
             form.face.data.save(app.config['FC_DIR'] + user.face)
