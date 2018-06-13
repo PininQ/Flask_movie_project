@@ -3,7 +3,7 @@ __author__ = 'QB'
 from . import admin
 from flask import render_template, redirect, url_for, flash, session, request, abort
 from app.admin.forms import LoginForm, TagForm, MovieForm, PreviewForm, PwdForm, AuthForm, RoleForm, AdminForm
-from app.models import Admin, Tag, Movie, Preview, User, Comment, Moviecol, Oplog, Adminlog, Userlog, Auth, Role
+from app.models import Admin, Tag, Movie, Preview, User, Comment, Moviecol, Oplog, Adminlog, Userlog, Auth, Role,Suggest
 from functools import wraps
 from app import db, app
 from werkzeug.utils import secure_filename
@@ -378,7 +378,7 @@ def movie_edit(id=None):
             # 删除本地的视频
             if os.path.exists(app.config['UP_DIR'] + movie.url):
                 os.remove(app.config['UP_DIR'] + movie.url)
-            print("movie.url:" + app.config['UP_DIR'] + movie.url)
+                print("movie.url:" + app.config['UP_DIR'] + movie.url)
 
         # 上传logo
         if form.logo.data != '':  # 说明已经重新上传了封面
@@ -388,7 +388,7 @@ def movie_edit(id=None):
             # 删除本地的封面
             if os.path.exists(app.config['UP_DIR'] + movie.logo):
                 os.remove(app.config['UP_DIR'] + movie.logo)
-            print("movie.logo:" + app.config['UP_DIR'] + movie.logo)
+                print("movie.logo:" + app.config['UP_DIR'] + movie.logo)
 
         movie.title = data['title']
         movie.info = data['info']
@@ -498,7 +498,7 @@ def preview_edit(id=None):
             # 删除旧的上映预告
             if os.path.exists(app.config['UP_DIR'] + preview.logo):
                 os.remove(app.config['UP_DIR'] + preview.logo)
-            print("preview.logo:" + app.config['UP_DIR'] + preview.logo)
+                print("preview.logo:" + app.config['UP_DIR'] + preview.logo)
 
         preview.title = data['title']
         db.session.add(preview)
@@ -886,3 +886,20 @@ def admin_list(page=None):
         Admin.addtime.desc()
     ).paginate(page=page, per_page=PAGE_COUNT)
     return render_template("admin/admin_list.html", page_data=page_data)
+
+
+# 网站建议列表
+@admin.route("/suggest/list/<int:page>/", methods=['GET'])
+@admin_login_req
+@admin_auth
+def suggest_list(page=None):
+    if page is None:
+        page = 1
+    page_data = Suggest.query.join(
+        User
+    ).filter(
+        User.id == Suggest.user_id
+    ).order_by(
+        Suggest.addtime.desc()
+    ).paginate(page=page, per_page=PAGE_COUNT)
+    return render_template("admin/suggest_list.html", page_data=page_data)
