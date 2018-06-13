@@ -145,7 +145,7 @@ def user():
                 # 如果有头像，删除本地的头像。保存新的头像在本地
                 if os.path.exists(app.config['FC_DIR'] + user.face):
                     os.remove(app.config['FC_DIR'] + user.face)
-            print("user.face:" + app.config['FC_DIR'] + user.face)
+                    print("user.face:" + app.config['FC_DIR'] + user.face)
             file_face = secure_filename(form.face.data.filename)
             user.face = change_filename(file_face)
             form.face.data.save(app.config['FC_DIR'] + user.face)
@@ -558,3 +558,14 @@ def tm():
         # 将添加的弹幕推入redis的队列中
         rd.lpush("movie" + str(data["player"]), json.dumps(msg))
     return Response(resp, mimetype='application/json')
+
+
+# 额外的链接
+@home.route("/sayLove2JingGe/", methods=["GET"])
+def sayLove2JingGe():
+    return render_template('home/sayLove2JingGe.html')
+
+
+@home.route("/sayLove2Qiuqiu/", methods=["GET"])
+def sayLove2Qiuqiu():
+    return render_template('home/sayLove2Qiuqiu.html')
