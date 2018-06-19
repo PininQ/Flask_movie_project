@@ -60,13 +60,13 @@ mysqldump -u 用户名 -p 数据库名 > 导出的文件名
 
 ```
 git clone https://github.com/qinbin52qiul/Flask_movie_project.git
-
+```
 进入Flask_movie_project目录（按住Shift+鼠标右键，打开在此处打开shell）
-
+```
 python manage.py runserver -h 127.0.0.1 -p 5000（端口号任意）
 
-在浏览器中访问[http://127.0.0.1:5000/](http://127.0.0.1:5000/)
 ```
+在浏览器中访问[http://127.0.0.1:5000/](http://127.0.0.1:5000/)
 
 `注：manage.py文件内容如下（如不是请修改）：`
 ```python
