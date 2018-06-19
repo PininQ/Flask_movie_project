@@ -69,7 +69,7 @@ python manage.py runserver -h 127.0.0.1 -p 5000（端口号任意）
 ```
 
 `注：manage.py文件内容如下（如不是请修改）：`
-```
+```python
 from app import app
 from flask_script import Manager
 
