@@ -68,7 +68,7 @@ python manage.py runserver -h 127.0.0.1 -p 5000（端口号任意）
 ```
 在浏览器中访问[http://127.0.0.1:5000/](http://127.0.0.1:5000/)
 
-`注：manage.py文件内容如下（如不是请修改）：`
+<font color=red>注：manage.py文件内容如下（如不是请修改）：</font>
 ```python
 from app import app
 from flask_script import Manager
