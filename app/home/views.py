@@ -179,7 +179,6 @@ def user():
 
 # ta主页及动态
 @home.route('/user/<int:id>/<int:page>/', methods=['GET'])
-@user_login_req
 def user_info(id=None, page=None):
     user = User.query.get_or_404(int(id))
     if page is None:
@@ -566,6 +565,6 @@ def sayLove2JingGe():
     return render_template('home/sayLove2JingGe.html')
 
 
-@home.route("/sayLove2Qiuqiu/", methods=["GET"])
+@home.route("/bl/", methods=["GET"])
 def sayLove2Qiuqiu():
     return render_template('home/sayLove2Qiuqiu.html')
