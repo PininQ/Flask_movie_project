@@ -38,24 +38,24 @@ Flask_movie_project/    <-- 根目录
 
 ## 运行项目
 
-- 安装项目所需依赖包
-
+- **安装项目所需依赖包**
+    
 
 ```
 pip install -r req.txt
 ```
 
-- 导入数据库
+- **导入数据库**
 
 
 ```
-mysqldump -u 用户名 -p 数据库名 > 导出的文件名
+mysqldump -u 用户名 -p 数据库名 > 导出的文件名  
 
 示例：mysqldump -u root -p root > movie.sql
 ```
 
 
-- 克隆项目到本地
+- **克隆项目到本地**
 
 
 ```
