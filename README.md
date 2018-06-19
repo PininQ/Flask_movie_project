@@ -65,7 +65,7 @@ git clone https://github.com/qinbin52qiul/Flask_movie_project.git
 
 python manage.py runserver -h 127.0.0.1 -p 5000（端口号任意）
 
-在浏览器中访问[http://127.0.0.1:5000/](https://note.youdao.com/)
+在浏览器中访问[http://127.0.0.1:5000/](http://127.0.0.1:5000/)
 ```
 
 `注：manage.py文件内容如下（如不是请修改）：`
