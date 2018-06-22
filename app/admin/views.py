@@ -3,7 +3,8 @@ __author__ = 'QB'
 from . import admin
 from flask import render_template, redirect, url_for, flash, session, request, abort
 from app.admin.forms import LoginForm, TagForm, MovieForm, PreviewForm, PwdForm, AuthForm, RoleForm, AdminForm
-from app.models import Admin, Tag, Movie, Preview, User, Comment, Moviecol, Oplog, Adminlog, Userlog, Auth, Role,Suggest
+from app.models import Admin, Tag, Movie, Preview, User, Comment, Moviecol, Oplog, Adminlog, Userlog, Auth, Role, \
+    Suggest
 from functools import wraps
 from app import db, app
 from werkzeug.utils import secure_filename
@@ -29,6 +30,8 @@ def tpl_extra():
 # 修改文件名称
 def change_filename(filename):
     fileinfo = os.path.splitext(filename)
+    print("fileinfo:" + filename)
+    print("fileinfo[-1]:" + fileinfo[-1])
     filename = datetime.now().strftime("%Y%m%d%H%M%S") + str(uuid.uuid4().hex) + fileinfo[-1]
     return filename
 
@@ -372,23 +375,25 @@ def movie_edit(id=None):
 
         # 上传视频
         if form.url.data != '':  # 说明已经重新上传了视频
-            file_url = secure_filename(form.url.data.filename)
-            movie.url = change_filename(file_url)
-            form.url.data.save(app.config["UP_DIR"] + movie.url)
-            # 删除本地的视频
+            # 先删除本地的视频
             if os.path.exists(app.config['UP_DIR'] + movie.url):
                 os.remove(app.config['UP_DIR'] + movie.url)
-                print("movie.url:" + app.config['UP_DIR'] + movie.url)
+                print("rm-movie.url:" + app.config['UP_DIR'] + movie.url)
+            file_url = secure_filename(form.url.data.filename)
+            print("file_url:"+file_url)
+            movie.url = change_filename(file_url)
+            form.url.data.save(app.config["UP_DIR"] + movie.url)
+            print("save-movie.url:" + app.config['UP_DIR'] + movie.url)
 
         # 上传logo
         if form.logo.data != '':  # 说明已经重新上传了封面
+            # 先删除本地的封面
+            if os.path.exists(app.config['UP_DIR'] + movie.logo):
+                os.remove(app.config['UP_DIR'] + movie.logo)
+                print("rm-movie.logo:" + app.config['UP_DIR'] + movie.logo)
             file_logo = secure_filename(form.logo.data.filename)
             movie.logo = change_filename(file_logo)
             form.logo.data.save(app.config["UP_DIR"] + movie.logo)
-            # 删除本地的封面
-            if os.path.exists(app.config['UP_DIR'] + movie.logo):
-                os.remove(app.config['UP_DIR'] + movie.logo)
-                print("movie.logo:" + app.config['UP_DIR'] + movie.logo)
 
         movie.title = data['title']
         movie.info = data['info']
@@ -492,13 +497,13 @@ def preview_edit(id=None):
             os.makedirs(app.config['UP_DIR'])
             os.chmod(app.config['UP_DIR'], 'rw')
         if form.logo.data != '':
-            file_logo = secure_filename(form.logo.data.filename)
-            preview.logo = change_filename(file_logo)
-            form.logo.data.save(app.config['UP_DIR'] + preview.logo)
             # 删除旧的上映预告
             if os.path.exists(app.config['UP_DIR'] + preview.logo):
                 os.remove(app.config['UP_DIR'] + preview.logo)
                 print("preview.logo:" + app.config['UP_DIR'] + preview.logo)
+            file_logo = secure_filename(form.logo.data.filename)
+            preview.logo = change_filename(file_logo)
+            form.logo.data.save(app.config['UP_DIR'] + preview.logo)
 
         preview.title = data['title']
         db.session.add(preview)

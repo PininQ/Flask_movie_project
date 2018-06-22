@@ -36,7 +36,9 @@
         <div class="col-md-4" style="height:500px;">
             <div class="panel panel-info">
                 <div class="panel-heading">
-                    <h3 class="panel-title"><span class="glyphicon glyphicon-facetime-video"></span>&nbsp;视频介绍</h3>
+                    <h3 class="panel-title" style="display:inline;"><span class="glyphicon glyphicon-facetime-video"></span>&nbsp;视频介绍</h3>
+                    <a href="{{ url_for('home.play',id=movie.id,page=1) }}" class="label label-danger" style="font-size: 14px">
+                    切换普通播放</a>
                 </div>
                 <div class="panel-body" style="height:459px;overflow:auto;">
                     <table class="table">

@@ -385,7 +385,7 @@ def index(page=None):
             )
     if page is None:
         page = 1
-    page_data = page_data.paginate(page=page, per_page=PAGE_COUNT)
+    page_data = page_data.paginate(page=page, per_page=4)
     p = dict(
         tid=tid,
         star=star,
@@ -458,7 +458,15 @@ def play(id=None, page=None):
         )
         db.session.add(comment)
         db.session.commit()
-        movie.commentnum = movie.commentnum + 1
+        commentnum = Comment.query.join(
+            Movie
+        ).join(
+            User
+        ).filter(
+            Movie.id == movie.id,
+            User.id == Comment.user_id
+        ).count()
+        movie.commentnum = commentnum
         db.session.add(movie)
         db.session.commit()
         flash("添加评论成功！", "ok")
