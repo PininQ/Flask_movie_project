@@ -32,7 +32,7 @@
                 {% for v in page_data.items %}
                 <div class="media">
                     <div class="media-left">
-                        <a href="{{ url_for('home.play',id=v.movie_id,page=1) }}">
+                        <a href="{{ url_for('home.video',id=v.movie_id,page=1) }}">
                             <img class="media-object" style="width: 131px;height: 83px;"
                                  src="{{ url_for('static',filename='uploads/'+v.movie.logo) }}"
                                  alt="{{ v.movie.title }}">
@@ -40,10 +40,10 @@
                     </div>
                     <div class="media-body">
                         <h4 class="media-heading">
-                            <a href="{{ url_for('home.play',id=v.movie_id,page=1) }}" style="color: #000000;text-decoration:none; ">
+                            <a href="{{ url_for('home.video',id=v.movie_id,page=1) }}" style="color: #000000;text-decoration:none; ">
                                 {{ v.movie.title }}
                             </a>
-                            <a href="{{ url_for('home.play',id=v.movie_id,page=1) }}" class="label label-primary pull-right">
+                            <a href="{{ url_for('home.video',id=v.movie_id,page=1) }}" class="label label-primary pull-right">
                                 <span class="glyphicon glyphicon-play"></span>播放视频</a>
                         </h4>
                         {{ v.movie.info }}
