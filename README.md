@@ -3,7 +3,7 @@
 小花椒网站是一个基于Flask框架而搭建的视频类网站。
 
 
-线上演示地址: [http://www.xhuajiao.top](http://www.xhuajiao.top)
+线上演示地址: [http://www.xhuajiao.top](https://www.xhuajiao.top)
 
 
 ## 实现功能
