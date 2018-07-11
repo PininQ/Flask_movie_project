@@ -40,7 +40,7 @@
                                 <div class="comment-meta">
                                     <a class="comment-author" style="text-decoration:none;">{{ v.user.name }}</a>
                                     评论
-                                    <a href="{{ url_for('home.play',id=v.movie_id,page=1) }}" style="text-decoration:none;">
+                                    <a href="{{ url_for('home.video',id=v.movie_id,page=1) }}" style="text-decoration:none;">
                                         《{{ v.movie.title }}》
                                     </a>
                                     于<time title="{{ v.addtime }}" datetime="{{ v.addtime }}">{{ v.addtime }}</time>
